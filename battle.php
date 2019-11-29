@@ -1,10 +1,3 @@
-<?php
-if(!empty($_POST)){
-    header('Location:battleStart.php'); //戦闘画面へ
-}
-
-?>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,8 +7,8 @@ if(!empty($_POST)){
 <body>
     <main class="main">
         <h1>OBUKATU QUEST</h1>
-        <form method="post">
-        <input type="submit" name="btn" value="冒険をスタートする">
+        <form action="battleStart.php" method="post">
+        <input type="submit" name="start" value="冒険をスタートする">
         </form>
     </main>
 </body>

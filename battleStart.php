@@ -1,17 +1,12 @@
 <?php
 
+require('function.php');
+
 ini_set('log_errors','on');
 ini_set('error_log','php.log');
 session_start();
 
-$players = array();     //プレイヤー達格納用
 $monsters = array();    //モンスター達格納用
-
-//性別クラス
-class Sex{
-    const MAN = 1;
-    const WOMAN = 2;
-}
 
 //抽象クラス（生き物クラス）
 abstract class Creature{
@@ -79,12 +74,9 @@ class Status{
 }
 //人クラス
 class Human extends Creature{
-    //プロパティ
-    protected $sex;
     //コンストラクタ
-    public function __construct($name, $sex, $hp, $mp, $img, $attackMin, $attackMax, $defence, $speed){
+    public function __construct($name, $hp, $mp, $img, $attackMin, $attackMax, $defence, $speed){
         $this->name = $name;
-        $this->sex = $sex;
         $this->hp = $hp;
         $this->mp = $mp;
         $this->img = $img;
@@ -92,13 +84,6 @@ class Human extends Creature{
         $this->attackMax = $attackMax;
         $this->defence = $defence;
         $this->speed = $speed;
-    }
-
-    public function setSex($num){
-        $this->sex = $num;
-    }
-    public function getSex(){
-        return $this->sex;
     }
     public function attack($targetObj){
         $attackPoint = mt_rand($this->attackMin,$this->attackMax);
@@ -113,14 +98,7 @@ class Human extends Creature{
 
     public function sayCry(){
         History::set($this->name);
-        switch($this->sex){
-            case Sex::MAN :
-                History::set('「ぐふっ！」');
-                break;
-            case Sex::WOMAN :
-                History::set('「いやっ！」');
-                break;
-        }
+        History::set('「ぐふっ！」');
     }
 }
 
@@ -169,9 +147,10 @@ class History{
 }
 
 //インスタンス生成
-$players1 = new Human('アオタケ', SEX::MAN, 166, 51, "img/noimage.jpg", 43,52,85,60);
-$monsters[] = new Monster('ス〇イム', 100, 4000, "img/monster01.jpg",15,21,30,50);
+$players = new Human('アオタケ', 166, 51, "img/noimage.jpg", 43,52,85,60);
+debug('$player：'.print_r($players->getName(),true));
 
+$monsters[] = new Monster('ス〇イム', 100, 4000, "img/monster01.jpg",15,21,30,50);
 $magic[] = new Magic('ホ◯ミ', 3, 25, 35, 0, 0);
 $magic[] = new Magic('ギ〇', 2, 9, 15, 0, 0);
 $magic[] = new Magic('ラ〇ホー', 18, 150, 185, 0, 0);
@@ -179,18 +158,19 @@ $magic[] = new Magic('マ〇トーン', 5, 18, 27, 0, 0);
 $magic[] = new Magic('ベホ◯ミ', 5, 75, 85, 0, 0);
 $magic[] = new Magic('ベ〇ラマ', 4, 75, 91, 0, 0);
 
-
-
 function createMonster(){
     global $monsters;
     $monster = $monsters[0];    //現状では単体テストの為、モンスター固定
     History::set($monster->getName().'が現れた');
     $_SESSION['monster'] = $monster;
 }
+
 function createHuman(){
-    global $players1;
-    $_SESSION['player1'] = $players1;
+    global $players;
+    $_SESSION['player'] = $players;
+    debug('$_SESSION_player：'.print_r($_SESSION['player'],true));
 }
+
 
 function init(){
     History::clear();
@@ -204,6 +184,10 @@ function gameOver(){
 }
 
 //1.post送信されていた場合
+debug('反応あり　POST前');
+debug('$_POST：'.print_r($_POST,true));
+
+
 if(!empty($_POST)){
     $attackFlg = (!empty($_POST['attack'])) ? true : false;
     $startFlg = (!empty($_POST['start'])) ? true : false;
@@ -221,17 +205,17 @@ if(!empty($_POST)){
         //攻撃するを押した場合
         if($attackFlg){
             //モンスターに攻撃を与える
-            History::set($_SESSION['player1']->getName().'のこうげき！');
-            $_SESSION['player1']->attack($_SESSION['monster']);
+            History::set($_SESSION['player']->getName().'のこうげき！');
+            $_SESSION['player']->attack($_SESSION['monster']);
             $_SESSION['monster']->sayCry();
 
             //モンスターが攻撃をする
             History::set($_SESSION['monster']->getName().'のこうげき！');
-            $_SESSION['monster']->attack($_SESSION['player1']);
-            $_SESSION['player1']->sayCry();
+            $_SESSION['monster']->attack($_SESSION['player']);
+            $_SESSION['player']->sayCry();
       
             //自分のhpが0以下になったらゲームオーバー
-            if($_SESSION['player1']->getHp() <= 0){
+            if($_SESSION['player']->getHp() <= 0){
                 gameOver();
             }else{
                 // hpが0以下になったら、別のモンスターを出現させる
@@ -272,9 +256,9 @@ if(!empty($_POST)){
 
             <div class="status">
                 <ul class="window__player">
-                    <li class="window__item"><?php echo  $_SESSION['player1']->getName(); ?></li>
-                    <li class="window__item">HP <?php echo $_SESSION['player1']->getHp(); ?></li>
-                    <li class="window__item">MP <?php echo $_SESSION['player1']->getMp(); ?></li>
+                    <li class="window__item"><?php echo  $_SESSION['player']->getName(); ?></li>
+                    <li class="window__item">HP <?php echo $_SESSION['player']->getHp(); ?></li>
+                    <li class="window__item">MP <?php echo $_SESSION['player']->getMp(); ?></li>
                 </ul>
             </div>
 
@@ -306,13 +290,16 @@ if(!empty($_POST)){
                         <li class="window__item"><?php echo '▶ '.$_SESSION['monster']->getName(); ?></li>
                     </ul>
                 </div>
+
+                <div class="main_right">
+                   <div class="window window__history">
+                       <p><?php echo (!empty($_SESSION['history'])) ? $_SESSION['history'] : ''; ?></p>
+                    </div>
+                </div>
+
+
             </div>
 
-        </div>
-        <div class="main_right">
-            <div class="window window__history">
-            <p><?php echo (!empty($_SESSION['history'])) ? $_SESSION['history'] : ''; ?></p>
-            </div>
         </div>
 
        <?php } ?>
