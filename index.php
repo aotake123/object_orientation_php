@@ -1,121 +1,117 @@
 <?php
 
-ini_set('log_errors','on'); //ログを取るか
-ini_set('error_log','php.log'); //ログの出力ファイルを指定
-session_start();    //セッション使う
+ini_set('log_errors','on');
+ini_set('error_log','php.log');
+session_start();
 
-//モンスター達格納用
-$monsters = array();
-//性別クラス
+//インスタンス格納用変数
+    $stores = array();   //店舗一覧
+    $homes = array();   //住居一覧
+    $customers = array();    //住人一覧
+    $areas = array();    //配送地域一覧
+
 class Sex{
     const MAN = 1;
     const WOMAN = 2;
-    const OKAMA = 3;
 }
-//抽象クラス（生き物クラス）
-abstract class Creature{
-    protected $name;
-    protected $hp;
-    protected $attackMin;
-    protected $attackMax;
-    abstract public function sayCry();
+class Weather{
+    const HARE = 1;
+    const KUMORI = 2;
+    const AME = 3;
+}
+class Item{
+    const LIGHT = 1;
+    const MIDDLE = 2;
+    const HEAVY = 3;
+}
+class MESSAGE{
+    const Positive_Deli1 = お疲れ様です！UBERです;
+    const Positive_Deli2 = どうもです！UBERです;
+    const Positive_Deli3 = 毎度です！UBERです！;
+    const Positive_shop1 = 配達お願いします！;
+    const Positive_shop2 = よろしくお願いします！;
+}
+class HOUSE{
+    const WOOD = 1;
+    const RC = 2;
+    const SRC = 3;
+    const TOWER = 4;
+}
 
-    public function setName($str){
-        $this->name = $str;
-    }
-    public function getName(){
-        return $this->name;
-    }
-    public function setHp($num){
-        $this->hp = $num;
-    }
-    public function getHp(){
-        return $this->hp;
-    }
-    public function attack($targetObj){
-        $attackPoint = mt_rand($this->attackMin, $this->attackMax);
-        if(!mt_rand(0,9)){  //10分の1でクリティカル
-            $attackPoint = $attackPoint * 1.5;
-            $attackPoint = (int)$attackPoint;
-            History::set($this->getName().'のクリティカルヒット!!');
-        }
-        $targetObj->setHp($targetObj->getHp()-$attackPoint);
-        History::set($attackPoint.'ポイントのダメージ！');
-    }
-}
-//人クラス
-class Human extends Creature{
+//配達員、お客さんの上位の抽象クラス
+abstract Class Human{ 
+    abstract public function SayMessage();
+    protected $name;
     protected $sex;
-    public function __construct($name, $sex, $hp, $attackMin, $attackMax){
+}
+
+Class Driver extends Human{ 
+     protected $clock;  //現在時刻
+     protected $hp;   //体力
+     protected $power;    //筋力
+     protected $faceimg;  //配達員画像
+     protected $hungry;   //満腹度
+     protected $water;    //喉の乾き
+     protected $toilet;   //トイレ危険度
+     protected $money;    //所持金
+     protected $passion;  //やる気
+     public function SayMessage(){
+     }
+     public function __construct($name, $sex, $clock, $hp, $power, $faceimg, $hungry, $water, $toilet, $money, $passion){
         $this->name = $name;
         $this->sex = $sex;
-        $this->hp = $hp;
-        $this->attackMin = $attackMin;
-        $this->attackMax = $attackMax;
-    }
-    public function setSex($num){
-        $this->sex = $num;
-    }
-    public function getSex(){
-        return $this->sex;
-    }
-    public function sayCry(){
-        History::set($this->name.'が叫ぶ！');
-        switch($this->sex){
-            case Sex::MAN :
-                History::set('ぐはぁっ！');
-                break;
-            case Sex::WOMAN :
-                History::set('きゃっ');
-                break;
-            case Sex::OKAMA :
-                History::set('もっと！');
-                break;
-        }
-    }
-}
-//モンスタークラス
-class Monster extends Creature{
-    //プロパティ
+        $this->clock = $clock;
+        $this->hp  = $hp;
+        $this->power = $power;
+        $this->faceimg  = $faceimg;
+        $this->hungry = $hungry;
+        $this->water  = $water;
+        $this->toilet  = $toilet;
+        $this->money  = $money;
+        $this->passion = $passion;
+     }
+ }
+
+Class Customer extends Human{
     protected $img;
-    //コンストラクタ
-    public function __construct($name, $hp, $img, $attackMin, $attackMax){
+    public function SayMessage(){
+    }
+    public function __construct($name, $sex, $img){
         $this->name = $name;
-        $this->hp = $hp;
+        $this->sex = $sex;
         $this->img = $img;
-        $this->attackMin = $attackMin;
-        $this->attackMax = $attackMax;
-    }
-    //ゲッター
-    public function getImg(){
-        return $this->img;
-    }
-    public function sayCry(){
-        History::set($this->name.'が叫ぶ！');
-        History::set('はうっ！');
     }
 }
-//魔法を使えるモンスタークラス
-class MagicMonster extends Monster{
-    private $magicAttack;
-    function __construct($name, $hp, $img, $attackMin, $atacckMax,$magicAttack){
-        parent::__construct($name, $hp, $img, $attackMin, $atacckMax);
-        $this->magicAttack = $magicAttack;
-    }
-    public function getMagicAttack(){
-        return $this->magicAttack;
-    }
-    public function attack($targetObj){
-        if(!mt_rand(0,4)){
-            History::set($this->name.'の魔法攻撃！');
-            $targetObj->setHp($targetObj->getHp() - $this->magicAttack );
-            History::set($this->magicAttack.'ポイントのダメージを受けた！');
-        }else{
-            parent::attack($targetObj);
-        }
+
+abstract class Building{
+    public $spotName;    //場所の名前
+    public $spotImg;    //場所の画像
+    public $distance; //配達に必要な基本の距離(m)
+}
+
+Class Shop extends Building{
+    protected $itemName; //渡す商品の名前
+    public function __construct($spotName, $spotImg, $distance, $itemName){
+        $this->name = $spotName;
+        $this->img = $spotImg;
+        $this->distance = $distance;
+        $this->itemName = $itemName;
     }
 }
-//履歴管理クラス（インスタンス化して複数に増殖させる必要性がないクラスなので、staticにする）
+
+Class Home extends Building{
+    protected $howHouse; //住宅の種類
+}
+
+Class Area{
+    protected $areaName;
+    //時間毎に注文毎にかかる時間
+    protected $orderTime_morning;
+    protected $orderTime_lunch;
+    protected $orderTime_denner;
+}
+
+//履歴管理クラス
 class History{
     public static function set($str){
         //セッションhistoryが作られていなければ作る
@@ -129,32 +125,70 @@ class History{
 }
 
 //インスタンス生成
-$human = new Human('勇者見習い', Sex::OKAMA, 500, 40, 120);
-$monsters[] = new Monster( 'フランケン', 100, 'img/monster01.png', 20, 40 );
-$monsters[] = new MagicMonster( 'フランケンNEO', 300, 'img/monster02.png', 20, 60, mt_rand(50, 100) );
-$monsters[] = new Monster( 'ドラキュリー', 200, 'img/monster03.png', 30, 50 );
-$monsters[] = new MagicMonster( 'ドラキュラ男爵', 400, 'img/monster04.png', 50, 80, mt_rand(60, 120) );
-$monsters[] = new Monster( 'スカルフェイス', 150, 'img/monster05.png', 30, 60 );
-$monsters[] = new Monster( '毒ハンド', 100, 'img/monster06.png', 10, 30 );
-$monsters[] = new Monster( '泥ハンド', 120, 'img/monster07.png', 20, 30 );
-$monsters[] = new Monster( '血のハンド', 180, 'img/monster08.png', 30, 50 );
+//配達員
+$deriver = new Driver('宇羽太郎', Sex::MAN,  30, 30, 30, 30, 30, 30, 30, 30, 30);
+//ショップ一覧
+$shops[] = new Shop( 'マクドナルド', 'img/shop01.jpg', 10, Item::LIGHT);
+$shops[] = new Shop( 'タピオカ屋', 'img/shop02.jpg', 15, Item::LIGHT);
+$shops[] = new Shop( '吉野家', 'img/shop03.jpg', 15, Item::LIGHT);
+$shops[] = new Shop( '筋肉食堂', 'img/shop04.jpg', 15, Item::MIDDLE);
+$shops[] = new Shop( '松屋', 'img/shop05.jpg', 15, Item::MIDDLE);
+$shops[] = new Shop( 'オリジン弁当', 'img/shop06.jpg', 15, Item::MIDDLE);
+$shops[] = new Shop( 'ゴーゴーカレー', 'img/shop07.jpg', 15, Item::MIDDLE);
+//住宅一覧
+$homes[] = new Home( '木造住宅', 'img/home01.jpg', 400, HOUSE::WOOD);
+$homes[] = new Home( '鉄骨住宅', 'img/home02.jpg', 400, HOUSE::RC);
+$homes[] = new Home( '高級住宅', 'img/home03.jpg', 400, HOUSE::SRC);
+$homes[] = new Home( 'タワーマンション', 'img/home04.jpg', 400, HOUSE::TOWER);
+//住人一覧
+$customers[] = new Customer( '20代社会人', Sex::MAN, 'img/customer01.jpg');
+$customers[] = new Customer( '20代社会人', Sex::WOMAN, 'img/customer02.png');
+$customers[] = new Customer( '大学生', Sex::MAN, 'img/customer03.jpg');
+$customers[] = new Customer( '女子大生', Sex::WOMAN, 'img/customer04.jpg');
+$customers[] = new Customer( '30代社会人', Sex::MAN, 'img/customer05.jpg');
+$customers[] = new Customer( '30代社会人', Sex::WOMAN, 'img/customer06.jpg');
+$customers[] = new Customer( '40代社会人', Sex::MAN, 'img/customer07.jpg');
+$customers[] = new Customer( '40代社会人', Sex::WOMAN, 'img/customer08.jpg');
+//エリア一覧
+$areas[] = new Area( '新宿', 'img/area01.jpg', 15, 10, 15);
+$areas[] = new Area( '表参道', 'img/area02.jpg', 20, 15, 20);
+$areas[] = new Area( '渋谷', 'img/area03.jpg', 15, 10, 15);
+$areas[] = new Area( '恵比寿', 'img/area04.jpg', 15, 10, 15);
+$areas[] = new Area( '中目黒', 'img/area05.jpg', 20, 10, 20);
+$areas[] = new Area( '五反田', 'img/area06.jpg', 20, 10, 15);
+$areas[] = new Area( '品川', 'img/area07.jpg', 25, 10, 20);
+$areas[] = new Area( '田町', 'img/area08.jpg', 25, 10, 20);
+$areas[] = new Area( '新橋', 'img/area09.jpg', 20, 15, 20);
+$areas[] = new Area( '赤坂', 'img/area10.jpg', 10, 15, 15);
+$areas[] = new Area( '六本木', 'img/area11.jpg', 15, 10, 15);
+$areas[] = new Area( '麻布十番', 'img/area12.jpg', 15, 10, 15);
+$areas[] = new Area( '青山一丁目', 'img/area13.jpg', 20, 15, 25);
+$areas[] = new Area( '神宮前', 'img/area14.jpg', 20, 20, 20);
+$areas[] = new Area( '代々木', 'img/area15.jpg', 15, 10, 15);
 
-function createMonster(){
-    global $monsters;
-    $monster = $monsters[mt_rand(0,7)];
-    History::set($monster->getName().'が現れた！');
-    $_SESSION['monster'] = $monster;
+
+
+function createDriver(){
+    global $deriver;
+    $_SESSION['deriver'] = $deriver;
 }
-function createHuman(){
-    global $human;
-    $_SESSION['human'] = $human;
+function createShop(){
+    global $shop;
+    $shop = $shops[mt_rand(0,1)];
+    History::set('アプリから注文が入りました！');
+    $_SESSION['shop'] = $shop;
+}
+function createHome(){
+    global $home;
+    $home = $homes[mt_rand(0,1)];
+    History::set('〜に配達に訪れました！！');
 }
 function init(){
     History::clear();
     History::set('初期化します！');
-    $_SESSION['knockDownCount'] = 0;
-    createHuman();
-    createMonster();
+    $_SESSION['DeriveryCount'] = 0;
+    createDriver();
+    createOrder();
 }
 function gameOver(){
     $_SESSION = array();
@@ -162,43 +196,38 @@ function gameOver(){
 
 //1.post送信されていた場合
 if(!empty($_POST)){
-    $attackFlg = (!empty($_POST['attack'])) ? true : false;
+    $pickFlg = (!empty($_POST['pickup'])) ? true : false;
     $startFlg = (!empty($_POST['start'])) ? true : false;
     error_log('POSTされた！');
 
     if($startFlg){
-        History::set('ゲームスタート！');
+        History::set('配達スタート！');
         init();
     }else{
-        //攻撃するを押した場合
-        if($attackFlg){
-            //モンスターに攻撃を与える
-            History::set($_SESSION['human']->getName().'の攻撃！');
-            $_SESSION['human']->attack($_SESSION['monster']);
-            $_SESSION['monster']->sayCry();
-
-            //モンスターが攻撃をする
-            History::set($_SESSION['monster']->getName().'の攻撃！');
-            $_SESSION['monster']->attack($_SESSION['human']);
-            $_SESSION['human']->sayCry();
-
-            //自分のhpが0以下になったらゲームオーバー
+        //集荷を押した場合
+        if($pickFlg){
+            //店に言って情報が読み込まれ、選択肢が変化する
+        //配達を押した場合
+            //配達員が消耗をする
+            //売り上げ金額が上がる
+         //条件を満たした場合（体力ゼロ）はゲームオーバーとする
             if($_SESSION['human']->getHp() <= 0){
                 gameOver();
+         //24時を回った場合は日付を翌日の8時まで進める
             }else{
-                //hpが0になったら、別のモンスターを出現させる
-                if($_SESSION['monster']->getHp() <= 0){
-                    History::set($_SESSION['monster']->getName().'を倒した！');
-                    createMonster();
-                    $_SESSION['knockDownCount'] = $_SESSION['knockDownCount']+1;
+                //配達が完了したら、また次の配送を発生させる
+                if($_SESSION['human']->hp <= 0){
+                    History::set($_SESSION['shop']->itemName.'の配送を完了した！');
+                    createOrder();
+                    $_SESSION['DeriveryCount'] = $_SESSION['DeriveryCount']+1;
                 }
             }
-        }else{  //逃げるを押した場合
-            History::set('逃げた！');
-            createMonster();
-        }
+        }else{
+            History::set('配送拒否を行いました！');
+            createOrder();
     }
-    $_POST = array();
+}
+$_POST = array();
 }
 
 ?>
@@ -207,63 +236,10 @@ if(!empty($_POST)){
 <html>
   <head>
     <meta charset="utf-8">
-    <title>ホームページのタイトル</title>
-    <style>
-    	body{
-	    	margin: 0 auto;
-	    	padding: 150px;
-	    	width: 25%;
-	    	background: #fbfbfa;
-        color: white;
-    	}
-    	h1{ color: white; font-size: 20px; text-align: center;}
-      h2{ color: white; font-size: 16px; text-align: center;}
-    	form{
-	    	overflow: hidden;
-    	}
-    	input[type="text"]{
-    		color: #545454;
-	    	height: 60px;
-	    	width: 100%;
-	    	padding: 5px 10px;
-	    	font-size: 16px;
-	    	display: block;
-	    	margin-bottom: 10px;
-	    	box-sizing: border-box;
-    	}
-      input[type="password"]{
-    		color: #545454;
-	    	height: 60px;
-	    	width: 100%;
-	    	padding: 5px 10px;
-	    	font-size: 16px;
-	    	display: block;
-	    	margin-bottom: 10px;
-	    	box-sizing: border-box;
-    	}
-    	input[type="submit"]{
-	    	border: none;
-	    	padding: 15px 30px;
-	    	margin-bottom: 15px;
-	    	background: black;
-	    	color: white;
-	    	float: right;
-    	}
-    	input[type="submit"]:hover{
-	    	background: #3d3938;
-	    	cursor: pointer;
-    	}
-    	a{
-	    	color: #545454;
-	    	display: block;
-    	}
-    	a:hover{
-	    	text-decoration: none;
-    	}
-    </style>
+    <title>UberEats配達員シュミレーター</title>
   </head>
   <body>
-   <h1 style="text-align:center; color:#333;">ゲーム「ドラ◯エ!!」</h1>
+   <h1 style="text-align:center; color:#333;">UBER EATS 配達シュミレータ</h1>
     <div style="background:black; padding:15px; position:relative;">
       <?php if(empty($_SESSION)){ ?>
         <h2 style="margin-top:60px;">GAME START ?</h2>
@@ -271,16 +247,26 @@ if(!empty($_POST)){
           <input type="submit" name="start" value="▶ゲームスタート">
         </form>
       <?php }else{ ?>
-        <h2><?php echo $_SESSION['monster']->getName().'が現れた!!'; ?></h2>
+        <h2><?php echo '携帯から注文依頼が鳴っています！'; ?></h2>
         <div style="height: 150px;">
-          <img src="<?php echo $_SESSION['monster']->getImg(); ?>" style="width:120px; height:auto; margin:40px auto 0 auto; display:block;">
+          <img src="" style="width:120px; height:auto; margin:40px auto 0 auto; display:block;">
         </div>
-        <p style="font-size:14px; text-align:center;">モンスターのHP：<?php echo $_SESSION['monster']->getHp(); ?></p>
-        <p>倒したモンスター数：<?php echo $_SESSION['knockDownCount']; ?></p>
-        <p>勇者の残りHP：<?php echo $_SESSION['human']->getHp(); ?></p>
+        <p style="font-size:14px; text-align:center;">現在の時刻：</p>
+        <p>配達員名：</p>
+        <p>本日の配達数：１２</p>
+        <p>体力：６７／１００</p>
+        <p>満腹度：４５／１００％</p>
+        <p>トイレ危険度：３５／１００％</p>
+        <p>自転車電池残量：／４７km</p>
+
         <form method="post">
-          <input type="submit" name="attack" value="▶攻撃する">
-          <input type="submit" name="escape" value="▶逃げる">
+          <input type="submit" name="pickup" value="▶集荷に向かう">
+          <input type="submit" name="combi" value="▶コンビニへ行く">
+          <input type="submit" name="yaoya" value="▶スーパーへ行く">
+          <input type="submit" name="park" value="▶公園へ行く">
+          <input type="submit" name="cycle" value="▶駐輪所へ行く">
+          <input type="submit" name="eat" value="▶飲食店へ行く">
+          <input type="submit" name="gohome" value="▶帰宅する">
           <input type="submit" name="start" value="▶ゲームリスタート">
         </form>
       <?php } ?>

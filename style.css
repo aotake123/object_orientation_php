@@ -13,6 +13,10 @@ ul,li{
 h1{ color: white; font-size: 20px; text-align: center;}
 h2{ color: white; font-size: 16px; text-align: center;}
 
+form{
+    overflow: hidden;
+}
+
 input[type="submit"]{
     border: none;
     font-size: 14px;
