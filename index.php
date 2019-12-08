@@ -43,6 +43,18 @@ abstract Class Human{
     abstract public function SayMessage();
     protected $name;
     protected $sex;
+    public function setName($str){
+        $this->name = $str;
+    }
+    public function getName(){
+        return $this->name;
+    }
+    public function setSex($num){
+        $this->sex = $num;
+    }
+    public function getSex(){
+        return $this->sex;
+    }
 }
 
 Class Driver extends Human{ 
@@ -69,6 +81,57 @@ Class Driver extends Human{
         $this->toilet  = $toilet;
         $this->money  = $money;
         $this->passion = $passion;
+     }
+     public function setClock($num2){
+         $this->clock = $num2;
+     }
+     public function getClock($num2){
+         return $this->clock;
+     }
+     public function setHp($num3){
+         $this->hp = $num3;
+     }
+     public function getHp(){
+         return $this->hp;
+     }
+     public function setPower($num4){
+         $this->power = $num4;
+     }
+     public function getPower(){
+         return $this->power;
+     }
+     public function getFaceImg(){
+         return $this->faceimg;
+     }
+     public function setHungry($num5){
+         $this->hungry = $num5;
+     }
+     public function getHungry(){
+         return $this->hungry;
+     }
+     public function setWater($num6){
+         $this->water = $num6;
+     }
+     public function getWater(){
+         return $this->water;
+     }
+     public function setToilet($num7){
+         $this->toilet = $num7;
+     }
+     public function getToilet(){
+         return $this->toilet;
+     }
+     public function setmoney($num8){
+         $this->toilet = $num8;
+     }
+     public function getMoney(){
+         return $this->money;
+     }
+     public function setPassion($num9){
+         $this->passion = $num9;
+     }
+     public function getPassion(){
+         return $this->passion;
      }
  }
 
