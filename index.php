@@ -144,13 +144,29 @@ Class Customer extends Human{
         $this->sex = $sex;
         $this->img = $img;
     }
+    public function getImg(){
+        return $this->img;
+    }
 }
 
 abstract class Building{
     public $spotName;    //場所の名前
     public $spotImg;    //場所の画像
     public $distance; //配達に必要な基本の距離(m)
+    public function setSpotName($num11){
+        $this->spotName = $num11;
+    }
+    public function getSpotName(){
+        return $this->spotName;
+    }
+    public function getSpotImg(){
+        return $this->spotImg;
+    }
+    public function getDistance(){
+        return $this->distance;
+    }
 }
+
 
 Class Shop extends Building{
     protected $itemName; //渡す商品の名前
@@ -160,18 +176,37 @@ Class Shop extends Building{
         $this->distance = $distance;
         $this->itemName = $itemName;
     }
+    public function getItemName(){
+        return $this->itemName;
+    }
 }
 
 Class Home extends Building{
     protected $howHouse; //住宅の種類
+    public function getHowHouse(){
+        return $this->howHouse;
+    }
 }
 
 Class Area{
     protected $areaName;
     //時間毎に注文毎にかかる時間
     protected $orderTime_morning;
-    protected $orderTime_lunch;
-    protected $orderTime_denner;
+    protected $orderTime_evening;
+    protected $orderTime_night;
+    public function getAreaName(){
+        return $this->areaName;
+    }
+    public function getMorning(){
+        return $this->orderTime_morning;
+    }
+    public function getEvening(){
+        return $this->orderTime_evening;
+    }
+    public function getNight(){
+        return $this->orderTime_night;
+    }
+
 }
 
 //履歴管理クラス
@@ -189,7 +224,7 @@ class History{
 
 //インスタンス生成
 //配達員
-$deriver = new Driver('宇羽太郎', Sex::MAN,  30, 30, 30, 30, 30, 30, 30, 30, 30);
+$deriver = new Driver('宇羽太郎', Sex::MAN,  30, 30, 30, 'img/shop01.jpg', 30, 30, 30, 30, 30);
 //ショップ一覧
 $shops[] = new Shop( 'マクドナルド', 'img/shop01.jpg', 10, Item::LIGHT);
 $shops[] = new Shop( 'タピオカ屋', 'img/shop02.jpg', 15, Item::LIGHT);
@@ -233,7 +268,7 @@ $areas[] = new Area( '代々木', 'img/area15.jpg', 15, 10, 15);
 
 function createDriver(){
     global $deriver;
-    $_SESSION['deriver'] = $deriver;
+    $_SESSION['driver'] = $deriver;
 }
 function createShop(){
     global $shop;
@@ -246,12 +281,23 @@ function createHome(){
     $home = $homes[mt_rand(0,1)];
     History::set('〜に配達に訪れました！！');
 }
+function createCustomer(){
+    global $home;
+    $home = $homes[mt_rand(0,1)];
+    History::set('〜が玄関口から現れた！！');
+}
+function createArea(){
+    global $home;
+    $home = $homes[mt_rand(0,1)];
+    History::set('〜に移動しました！！');
+}
+
 function init(){
     History::clear();
     History::set('初期化します！');
     $_SESSION['DeriveryCount'] = 0;
     createDriver();
-    createOrder();
+    createShop();
 }
 function gameOver(){
     $_SESSION = array();
@@ -299,44 +345,60 @@ $_POST = array();
 <html>
   <head>
     <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="style.css">
     <title>UberEats配達員シュミレーター</title>
   </head>
-  <body>
-   <h1 style="text-align:center; color:#333;">UBER EATS 配達シュミレータ</h1>
-    <div style="background:black; padding:15px; position:relative;">
-      <?php if(empty($_SESSION)){ ?>
-        <h2 style="margin-top:60px;">GAME START ?</h2>
-        <form method="post">
-          <input type="submit" name="start" value="▶ゲームスタート">
-        </form>
-      <?php }else{ ?>
-        <h2><?php echo '携帯から注文依頼が鳴っています！'; ?></h2>
-        <div style="height: 150px;">
-          <img src="" style="width:120px; height:auto; margin:40px auto 0 auto; display:block;">
-        </div>
-        <p style="font-size:14px; text-align:center;">現在の時刻：</p>
-        <p>配達員名：</p>
-        <p>本日の配達数：１２</p>
-        <p>体力：６７／１００</p>
-        <p>満腹度：４５／１００％</p>
-        <p>トイレ危険度：３５／１００％</p>
-        <p>自転車電池残量：／４７km</p>
 
-        <form method="post">
-          <input type="submit" name="pickup" value="▶集荷に向かう">
-          <input type="submit" name="combi" value="▶コンビニへ行く">
-          <input type="submit" name="yaoya" value="▶スーパーへ行く">
-          <input type="submit" name="park" value="▶公園へ行く">
-          <input type="submit" name="cycle" value="▶駐輪所へ行く">
-          <input type="submit" name="eat" value="▶飲食店へ行く">
-          <input type="submit" name="gohome" value="▶帰宅する">
-          <input type="submit" name="start" value="▶ゲームリスタート">
-        </form>
+  <body>
+    <div class="main">
+      <?php if(empty($_SESSION) || !empty($_SESSION['start'])){ ?>
+        <h1>UBER EATS 配達シュミレータ</h1>
+        <h2>GAME START ?</h2>
+        <div class="top_image">
+            <form method="post">
+            <input type="submit" name="start" value="▶ゲームスタート">
+            </form>
+        </div>
+      <?php }else{ ?>
+        <header>
+            <div class="subject"><h1>UBER EATS 配達シュミレータ</h1></div>
+            <div class="clock"></div>
+            <div class="date"></div>
+            <div class="physical"></div>
+        </header>
+        <div class="infomation">
+            <div class="town"></div>
+            <div class="info_wrap">
+                <div class="driver_picture">
+                    <div>
+                        <img class="prof_image" src="<?php $_SESSION['driver']->getFaceImg(); ?>">
+                    </div>
+                </div>
+                <div class="change_picture"></div>
+                <div class="status">
+                    <p>本日の配達数：１２</p>
+                    <p>満腹度：４５／１００％</p>
+                    <p>トイレ危険度：３５／１００％</p>
+                    <p>自転車電池残量：／４７km</p>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="command">
+                <form method="post">
+                    <input type="submit" name="pickup" value="▶集荷に向かう">
+                    <input type="submit" name="combi" value="▶コンビニへ行く">
+                    <input type="submit" name="yaoya" value="▶スーパーへ行く">
+                    <input type="submit" name="park" value="▶公園へ行く">
+                    <input type="submit" name="cycle" value="▶駐輪所へ行く">
+                    <input type="submit" name="eat" value="▶飲食店へ行く">
+                    <input type="submit" name="gohome" value="▶帰宅する">
+                    <input type="submit" name="start" value="▶ゲームリスタート">
+                </form>
+            </div>
+            <div class="history"></div>
+        </div>
       <?php } ?>
-      <div style="position:absolute; right:-350px; top:0; color:black; width: 300px;">
-        <p><?php echo (!empty($_SESSION['history'])) ? $_SESSION['history'] : ''; ?></p>
-      </div>
     </div>
-    
   </body>
 </html>
