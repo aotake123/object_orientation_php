@@ -1,10 +1,18 @@
-ul,li{
+ul,li,p,h1,h2{
     margin: 0;
     padding: 0;
 }
 
-h1{ color: white; font-size: 20px; text-align: center;}
-h2{ color: white; font-size: 16px; text-align: center;}
+h1{
+    color: white;
+    font-size: 20px;
+    text-align: left;
+}
+h2{ 
+    color: white;
+    font-size: 16px;
+    text-align: center;
+}
 
 body{
     margin: 0px auto 50px auto;
@@ -15,6 +23,98 @@ body{
     color: white;
 }
 
+/* main */
+.main{
+    background:#000000;
+    padding:15px;
+    border-radius: 3px;
+    position:relative;
+}
+.target{
+    width: 0 auto;
+    height: 150px;
+}
+
+/* header */
+.header{
+    position: relative;
+    overflow: hidden;
+}
+.header__clock{
+    position: absolute;
+    height: 100px;
+    width: 100px;
+    background: #545454;
+    z-index: 5;
+    display: inline-block;
+}
+.header__date{
+    width: 300px;
+    text-align: right;
+    float: left;
+}
+.header__physical{
+    text-align: left;
+    padding-left: 20px;
+    float: left;
+}
+
+
+/* infomation */
+.infomation{
+    position: relative;
+}
+.infoation__town{
+    text-align: left;
+    padding-left: 20px;
+}
+.infomation__wrap{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+}
+.informaiton__w-driver_picture{
+    width: 80px;
+    height: 80px;
+    margin: 10px;
+}
+.information__w-change_picture{
+    width: 80px;
+    height: 80px;
+    margin: 10px;
+}
+.informaiton__w-status{
+    width: 130px;
+    height: 150px;
+    margin: 10px;
+}
+.status_sentence{
+    margin-top: 5px;
+    margin-bottom:  5px;
+    font-size: 12px;
+}
+
+.window{
+    padding: 5px;
+    border: 3px solid #FFFFFF;
+    border-radius: 3px;
+}
+.prof_image{
+    width: 120px;
+}
+
+/* footer */
+.footer__history{
+    width: 300px;
+    height: 400px;
+    padding: 13px;
+    border: 3px solid #FFFFFF;
+    border-radius: 3px;
+    position: absolute;
+    display: none;
+}
+
+/* form */
 form{
     overflow: hidden;
 }
@@ -37,107 +137,4 @@ a{
 }
 a:hover{
     text-decoration: none;
-}
-
-/* main */
-.main{
-    background:#000000;
-    padding:15px;
-    border-radius: 3px;
-    position:relative;
-}
-.background{
-    background:black;
-    padding:15px;
-    position:relative;
-    overflow: hidden;
-}
-.target{
-    width: 0 auto;
-    height: 150px;
-}
-.command{
-    width: 100%;
-    overflow: hidden;
-}
-.main_left{
-    margin-right: 20px;
-    float: left;
-}
-.main_right{
-    position: absolute;
-    display: none;
-}
-.parameter{
-    font-size:  14px;
-    text-align: left;
-}
-
-/* プレイヤーステータス画面 */
-.status{
-    padding: 15px;
-    border: 3px solid #FFFFFF;
-    border-radius: 3px;
-    overflow: hidden;
-    display: inline-block;
-}
-.window__player{
-    margin-right: 15px;
-    float: left;
-}
-
-.prof_image{
-    width:120px;
-    height:auto;
-    margin:40px auto 0 auto;
-    display:block;
-}
-
-/* コマンド画面 */
-.window{
-    padding: 15px 10px;
-}
-
-.window__item{
-    font-size: 13px;
-    list-style: none;
-}
-.window__target{
-    text-align: center;
-    font-size: 13px;
-        width: 100%;
-    list-style: none;
-}
-.wrap_img{
-    margin: 0 auto;
-}
-.img_monster{
-    margin: 0 auto;
-    text-align: center;
-    list-style: none;
-}
-
-/* コマンド */
-.command__left{
-    width: 120px;
-    margin-right: 15px;
-    font-size: 14px;
-    border: 3px solid #FFFFFF;
-    border-radius: 3px;
-    float: left;
-}
-.command__right{
-    width: 200px;
-    border: 3px solid #FFFFFF;
-    border-radius: 3px;
-    float: left;
-}
-
-/* 履歴画面 */
-.window__history{
-    width: 300px;
-    height: 400px;
-    padding: 13px;
-    border: 3px solid #FFFFFF;
-    border-radius: 3px;
 }

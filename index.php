@@ -224,7 +224,7 @@ class History{
 
 //インスタンス生成
 //配達員
-$deriver = new Driver('宇羽太郎', Sex::MAN,  30, 30, 30, 'img/shop01.jpg', 30, 30, 30, 30, 30);
+$deriver = new Driver('宇羽太郎', Sex::MAN,  30, 30, 30, 'img/driver01.jpg', 30, 30, 30, 30, 30);
 //ショップ一覧
 $shops[] = new Shop( 'マクドナルド', 'img/shop01.jpg', 10, Item::LIGHT);
 $shops[] = new Shop( 'タピオカ屋', 'img/shop02.jpg', 15, Item::LIGHT);
@@ -346,58 +346,67 @@ $_POST = array();
   <head>
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="style.css">
-    <title>UberEats配達員シュミレーター</title>
+    <title>配達員シュミレーター</title>
   </head>
 
   <body>
     <div class="main">
       <?php if(empty($_SESSION) || !empty($_SESSION['start'])){ ?>
-        <h1>UBER EATS 配達シュミレータ</h1>
+      <div class="top__image">
+        <h1 class="subject">配達シュミレータ</h1>
         <h2>GAME START ?</h2>
-        <div class="top_image">
+        <div class="top__button">
             <form method="post">
             <input type="submit" name="start" value="▶ゲームスタート">
             </form>
         </div>
+      </div>
       <?php }else{ ?>
-        <header>
-            <div class="subject"><h1>UBER EATS 配達シュミレータ</h1></div>
-            <div class="clock"></div>
-            <div class="date"></div>
-            <div class="physical"></div>
+        <header class="header">
+            <div class="subject"><h1>配達シュミレータ</h1></div>
+            <div class="header__clock">AM8時00分</div>
+            <div class="header__date">2019年 12月05日(火)</div>
+            <div class="header__physical">(^_^)</div>
         </header>
         <div class="infomation">
-            <div class="town"></div>
-            <div class="info_wrap">
-                <div class="driver_picture">
+            <div class="infoation__town">新宿</div>
+            <div class="infomation__wrap">
+                <div class="informaiton__w-driver_picture window">
                     <div>
                         <img class="prof_image" src="<?php $_SESSION['driver']->getFaceImg(); ?>">
                     </div>
                 </div>
-                <div class="change_picture"></div>
-                <div class="status">
-                    <p>本日の配達数：１２</p>
-                    <p>満腹度：４５／１００％</p>
-                    <p>トイレ危険度：３５／１００％</p>
-                    <p>自転車電池残量：／４７km</p>
+                <div class="information__w-change_picture window"></div>
+                <div class="information__w-status window">
+                    <p class="status_sentence">本日の配達数：１２</p>
+                    <p class="status_sentence">満腹度：４５／１００％</p>
+                    <p class="status_sentence">トイレ危険度：３５／１００％</p>
+                    <p class="status_sentence">自転車電池残量：／４７km</p>
                 </div>
             </div>
         </div>
-        <div class="footer">
-            <div class="command">
-                <form method="post">
-                    <input type="submit" name="pickup" value="▶集荷に向かう">
-                    <input type="submit" name="combi" value="▶コンビニへ行く">
-                    <input type="submit" name="yaoya" value="▶スーパーへ行く">
-                    <input type="submit" name="park" value="▶公園へ行く">
-                    <input type="submit" name="cycle" value="▶駐輪所へ行く">
-                    <input type="submit" name="eat" value="▶飲食店へ行く">
-                    <input type="submit" name="gohome" value="▶帰宅する">
-                    <input type="submit" name="start" value="▶ゲームリスタート">
+        <footer class="footer">
+            <div class="footer__command">
+                <form method="footer__command-post">
+                    <table class="footer__command-table"><tbody>
+                        <tr>
+                            <td colspan="2"><input type="submit" name="pickup" value="▶集荷" class="cell"></td>
+                            <td><input type="submit" name="cycle" value="▶駐輪所"></td>
+                            <td><input type="submit" name="combi" value="▶コンビニ"></td>
+                        </tr>
+                        <tr>
+                            <td class="cell"><input type="submit" name="park" value="▶公園"></td>
+                            <td class="cell"><input type="submit" name="eat" value="▶飲食店"></td>
+                            <td class="cell"><input type="submit" name="gohome" value="▶帰宅"></td>
+                            <td class="cell"><input type="submit" name="start" value="▶リセット"></td>
+                        </tr>
+                    </tbody></table>
                 </form>
             </div>
-            <div class="history"></div>
-        </div>
+            <div class="footer__history">
+
+            </div>
+      </footer>
       <?php } ?>
     </div>
   </body>
