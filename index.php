@@ -25,7 +25,7 @@ class Item{
     const HEAVY = 3;
 }
 class MESSAGE{
-    const Positive_Deli1 = お疲れ様です！UBERです;
+    const Positive_Deli1 = こんにちは！UBERです;
     const Positive_Deli2 = どうもです！UBERです;
     const Positive_Deli3 = 毎度です！UBERです！;
     const Positive_shop1 = 配達お願いします！;
@@ -294,7 +294,7 @@ function createArea(){
 
 function init(){
     History::clear();
-    History::set('初期化します！');
+    History::set('配達の仕事を開始します！');
     $_SESSION['DeriveryCount'] = 0;
     createDriver();
     createShop();
@@ -302,19 +302,26 @@ function init(){
 function gameOver(){
     $_SESSION = array();
 }
+  
 
 //1.post送信されていた場合
 if(!empty($_POST)){
-    $pickFlg = (!empty($_POST['pickup'])) ? true : false;
-    $startFlg = (!empty($_POST['start'])) ? true : false;
+    $startFlg = (!empty($_POST['start'])) ? true : false;   //初回スタート
+    $pickFlg = (!empty($_POST['pick'])) ? true : false;   //集荷
+    $cycleFlg = (!empty($_POST['cycle'])) ? true : false;   //駐輪場
+    $combiFlg = (!empty($_POST['combi'])) ? true : false;   //コンビニ
+    $parkFlg = (!empty($_POST['park'])) ? true : false; //公園
+    $eatFlg = (!empty($_POST['eat'])) ? true : false;   //飲食店
+    $homeFlg = (!empty($_POST['home'])) ? true :false;  //帰宅
     error_log('POSTされた！');
 
     if($startFlg){
-        History::set('配達スタート！');
+        History::set('配達をスタートします！');
         init();
     }else{
         //集荷を押した場合
         if($pickFlg){
+            //集荷を発生させる
             //店に言って情報が読み込まれ、選択肢が変化する
         //配達を押した場合
             //配達員が消耗をする
@@ -331,12 +338,36 @@ if(!empty($_POST)){
                     $_SESSION['DeriveryCount'] = $_SESSION['DeriveryCount']+1;
                 }
             }
+        }else if($cycleFlg){
+            History::set('駐輪所に到着した！');
+            //時間を加算し、体力を低下させる
+            //一定確率で自転車の電池残量を回復し、一定確率で分岐させる
+        }else if($combiFlg){
+            History::set('コンビニに寄った！');
+            //時間を加算し、体力を低下させる
+            //トイレを借りて、トイレとやる気を回復させる
+            //買うものをランダムに選択して、お金を失わせ、空腹を回復させる
+        }else if($parkFlg){
+            History::set('公園に到着した！');
+            //時間を加算し、体力を低下させる
+            //一定確率で自転車の電池残量を回復し、一定確率で分岐させる
+        }else if($eatFlg){
+            History::set('飲食店（要編集）に到着した！');
+            //時間を加算し、体力を低下させる
+            //トイレを借りて、トイレとやる気を回復させる
+            //水分と空腹を回復させる、やる気も急増する
+            //食べる店舗はランダムで選択する
+        }else if($homeFlg){
+            History::set('今日は早めに帰って寝よう');
+            //体力を大幅に回復し、やる気、空腹、トイレ、自転車も全回復
+            //日付を進め、時間も開始時間に変更する
+            //新たな集荷を発生させる
         }else{
             History::set('配送拒否を行いました！');
             createOrder();
-    }
-}
-$_POST = array();
+        }
+    } 
+    $_POST = array();
 }
 
 ?>
@@ -369,7 +400,9 @@ $_POST = array();
             <div class="header__physical">(^_^)</div>
         </header>
         <div class="infomation">
-            <div class="infoation__town">新宿</div>
+            <div class="infoation__town">
+                <div class="information__town-name">現在地 >> 新宿</div>
+            </div>
             <div class="infomation__wrap">
                 <div class="informaiton__w-driver_picture window">
                     <div>
@@ -378,11 +411,14 @@ $_POST = array();
                 </div>
                 <div class="information__w-change_picture window"></div>
                 <div class="information__w-status window">
-                    <p class="status_sentence">本日の配達数：１２</p>
-                    <p class="status_sentence">満腹度：４５／１００％</p>
-                    <p class="status_sentence">トイレ危険度：３５／１００％</p>
-                    <p class="status_sentence">自転車電池残量：／４７km</p>
+                    <p class="status_sentence">配達数：12</p>
+                    <p class="status_sentence">満腹度：45/100%</p>
+                    <p class="status_sentence">トイレ：35/100%</p>
+                    <p class="status_sentence">自転車：34/47km</p>
                 </div>
+            </div>
+            <div class="information__history window">
+                <?php echo (!empty($_SESSION['history'])) ? $_SESSION['history'] : ''; ?>
             </div>
         </div>
         <footer class="footer">
@@ -390,15 +426,15 @@ $_POST = array();
                 <form method="footer__command-post">
                     <table class="footer__command-table"><tbody>
                         <tr>
-                            <td colspan="2"><input type="submit" name="pickup" value="▶集荷" class="cell"></td>
-                            <td><input type="submit" name="cycle" value="▶駐輪所"></td>
-                            <td><input type="submit" name="combi" value="▶コンビニ"></td>
+                            <td class="cell" colspan="2"><input type="submit" name="pick" value="集荷" class="cell"></td>
+                            <td class="cell"><input type="submit" name="cycle" value="駐輪所"></td>
+                            <td class="cell"><input type="submit" name="combi" value="コンビニ"></td>
                         </tr>
                         <tr>
-                            <td class="cell"><input type="submit" name="park" value="▶公園"></td>
-                            <td class="cell"><input type="submit" name="eat" value="▶飲食店"></td>
-                            <td class="cell"><input type="submit" name="gohome" value="▶帰宅"></td>
-                            <td class="cell"><input type="submit" name="start" value="▶リセット"></td>
+                            <td class="cell"><input type="submit" name="park" value="公園"></td>
+                            <td class="cell"><input type="submit" name="eat" value="飲食店"></td>
+                            <td class="cell"><input type="submit" name="home" value="帰宅"></td>
+                            <td class="cell"><input type="submit" name="start" value="リセット"></td>
                         </tr>
                     </tbody></table>
                 </form>

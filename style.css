@@ -1,10 +1,10 @@
-ul,li,p,h1,h2{
+ul,li,p,h1,h2,table,tbody,thead,tr,td,span{
     margin: 0;
     padding: 0;
 }
 
 h1{
-    color: white;
+    color: #1e1e1e;
     font-size: 20px;
     text-align: left;
 }
@@ -17,8 +17,8 @@ h2{
 body{
     margin: 0px auto 50px auto;
     padding: 50px;
-    width: 750px;
-    height: 340px;
+    width: 340px;
+    height: 750px;
     background: #ffffff;
     color: white;
 }
@@ -26,7 +26,7 @@ body{
 /* main */
 .main{
     background:#000000;
-    padding:15px;
+    border: 2px solid #1e1e1e;
     border-radius: 3px;
     position:relative;
 }
@@ -37,66 +37,91 @@ body{
 
 /* header */
 .header{
+    background-color: #FFFFFF;
     position: relative;
     overflow: hidden;
 }
+.subject{
+    padding: 5px 15px;
+    background: #FFFFFF;
+}
 .header__clock{
+    font-size: 13px;
     position: absolute;
-    height: 100px;
-    width: 100px;
+    padding: 5px 15px;
+    width: 80px;
+    border-radius: 0 8px 8px 0;
     background: #545454;
     z-index: 5;
     display: inline-block;
 }
 .header__date{
-    width: 300px;
+    width: 240px;
+    padding: 5px 15px;
     text-align: right;
+    font-size: 12px;
+    background-color: aquamarine;
     float: left;
 }
 .header__physical{
+    font-size: 12px;
     text-align: left;
-    padding-left: 20px;
+    padding: 5px 15px 5px 20px;
+    background-color: aqua;
     float: left;
 }
 
 
 /* infomation */
 .infomation{
+    padding: 5px 10px;
     position: relative;
 }
 .infoation__town{
     text-align: left;
-    padding-left: 20px;
+}
+.information__town-name{
+    font-size: 12px;
+    padding: 5px 15px;
+    margin-top: 5px;
+    margin-bottom: 5px; 
+    border: 2px solid #FFFFFF;
+    border-radius: 3px;
 }
 .infomation__wrap{
+    padding: 0 10px;
     position: relative;
     display: flex;
     flex-direction: row;
 }
 .informaiton__w-driver_picture{
-    width: 80px;
-    height: 80px;
-    margin: 10px;
+    width: 60px;
+    height: 60px;
+    margin: auto 10px 0 0;
 }
 .information__w-change_picture{
-    width: 80px;
-    height: 80px;
-    margin: 10px;
+    width: 60px;
+    height: 60px;
+    margin: auto 20px 0 0;
 }
 .informaiton__w-status{
-    width: 130px;
     height: 150px;
-    margin: 10px;
+    margin: 10px 0;
 }
 .status_sentence{
     margin-top: 5px;
     margin-bottom:  5px;
     font-size: 12px;
 }
+.information__history{
+    font-size: 12px;
+    margin-top: 5px;
+    height: 60px;
+}
 
 .window{
     padding: 5px;
-    border: 3px solid #FFFFFF;
+    border: 2px solid #FFFFFF;
     border-radius: 3px;
 }
 .prof_image{
@@ -104,6 +129,9 @@ body{
 }
 
 /* footer */
+.footer{
+    padding: 0 10px;
+}
 .footer__history{
     width: 300px;
     height: 400px;
@@ -113,6 +141,9 @@ body{
     position: absolute;
     display: none;
 }
+.footer__command-table{
+    margin: 0 auto;
+}
 
 /* form */
 form{
@@ -120,11 +151,14 @@ form{
 }
 
 input[type="submit"]{
+    width: 77px;
     border: none;
     font-size: 14px;
-    padding: 5px 15px;
+    padding: 5px 10px;
     margin-bottom: 5px;
     background: black;
+    border: 2px solid #FFFFFF;
+    border-radius: 3px;
     color: white;
 }
 input[type="submit"]:hover{
