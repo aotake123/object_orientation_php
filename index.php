@@ -4,8 +4,18 @@ ini_set('log_errors','on');
 ini_set('error_log','php.log');
 session_start();
 
+//年月日表示用関数
+if(!empty($_SESSION)){
+    $firstTime = '20191201080000';  //初期設定値
+}else{
+    $firstTime = '';
+}
+$tmp = strtotime($firstTime);
+$week = array('日','月','火','水','木','金','土');
+$weekNumber = date('w');
+
 //インスタンス格納用変数
-    $stores = array();   //店舗一覧
+    $shops = array();   //店舗一覧
     $homes = array();   //住居一覧
     $customers = array();    //住人一覧
     $areas = array();    //配送地域一覧
@@ -224,7 +234,7 @@ class History{
 
 //インスタンス生成
 //配達員
-$deriver = new Driver('宇羽太郎', Sex::MAN,  30, 30, 30, 'img/driver01.jpg', 30, 30, 30, 30, 30);
+$deriver = new Driver('宇羽太郎', Sex::MAN,  30, 30, 100, 'img/driver01.png', 30, 30, 30, 30, 30);
 //ショップ一覧
 $shops[] = new Shop( 'マクドナルド', 'img/shop01.jpg', 10, Item::LIGHT);
 $shops[] = new Shop( 'タピオカ屋', 'img/shop02.jpg', 15, Item::LIGHT);
@@ -264,32 +274,38 @@ $areas[] = new Area( '青山一丁目', 'img/area13.jpg', 20, 15, 25);
 $areas[] = new Area( '神宮前', 'img/area14.jpg', 20, 20, 20);
 $areas[] = new Area( '代々木', 'img/area15.jpg', 15, 10, 15);
 
-
+function movingPoint(){
+    //移動距離をランダムに決定
+    //距離に応じて減る体力を決定
+    //距離に応じて経過する時間を決定
+}
 
 function createDriver(){
     global $deriver;
     $_SESSION['driver'] = $deriver;
 }
 function createShop(){
-    global $shop;
-    $shop = $shops[mt_rand(0,1)];
+    global $shops;
+    $shop = $shops[mt_rand(0,6)];
     History::set('アプリから注文が入りました！');
     $_SESSION['shop'] = $shop;
 }
 function createHome(){
-    global $home;
+    global $homes;
     $home = $homes[mt_rand(0,1)];
     History::set('〜に配達に訪れました！！');
 }
 function createCustomer(){
-    global $home;
-    $home = $homes[mt_rand(0,1)];
+    global $customers;
+    $customer = $customers[mt_rand(0,1)];
     History::set('〜が玄関口から現れた！！');
+    $_SESSION['customer'] = $customer;
 }
 function createArea(){
-    global $home;
-    $home = $homes[mt_rand(0,1)];
+    global $areas;
+    $area = $areas[mt_rand(0,1)];
     History::set('〜に移動しました！！');
+    $_SESSION['area'] = $area;
 }
 
 function init(){
@@ -305,6 +321,7 @@ function gameOver(){
   
 
 //1.post送信されていた場合
+History::clear();
 if(!empty($_POST)){
     $startFlg = (!empty($_POST['start'])) ? true : false;   //初回スタート
     $pickFlg = (!empty($_POST['pick'])) ? true : false;   //集荷
@@ -340,7 +357,7 @@ if(!empty($_POST)){
             }
         }else if($cycleFlg){
             History::set('駐輪所に到着した！');
-            //時間を加算し、体力を低下させる
+            $_SESSION['MINUTE'];     //時間を加算し、体力を低下させる
             //一定確率で自転車の電池残量を回復し、一定確率で分岐させる
         }else if($combiFlg){
             History::set('コンビニに寄った！');
@@ -363,8 +380,8 @@ if(!empty($_POST)){
             //日付を進め、時間も開始時間に変更する
             //新たな集荷を発生させる
         }else{
-            History::set('配送拒否を行いました！');
-            createOrder();
+            //リセットを押してゲーム初期化
+            $_POST = array();
         }
     } 
     $_POST = array();
@@ -395,8 +412,10 @@ if(!empty($_POST)){
       <?php }else{ ?>
         <header class="header">
             <div class="subject"><h1>配達シュミレータ</h1></div>
-            <div class="header__clock">AM8時00分</div>
-            <div class="header__date">2019年 12月05日(火)</div>
+            <div class="header__clock"><?php echo date('H時i分',$tmp); ?></div>
+            <div class="header__date">
+                <?php echo date('Y年m月d日',$tmp); ?>(<?php echo $week[$weekNumber]; ?>)
+            </div>
             <div class="header__physical">(^_^)</div>
         </header>
         <div class="infomation">
@@ -423,9 +442,10 @@ if(!empty($_POST)){
         </div>
         <footer class="footer">
             <div class="footer__command">
-                <form method="footer__command-post">
+                <form method="post" class="footer__command-post">
                     <table class="footer__command-table"><tbody>
                         <tr>
+                            <?php if($_SESSION['pick'] === 1)  ?>
                             <td class="cell" colspan="2"><input type="submit" name="pick" value="集荷" class="cell"></td>
                             <td class="cell"><input type="submit" name="cycle" value="駐輪所"></td>
                             <td class="cell"><input type="submit" name="combi" value="コンビニ"></td>
@@ -434,7 +454,7 @@ if(!empty($_POST)){
                             <td class="cell"><input type="submit" name="park" value="公園"></td>
                             <td class="cell"><input type="submit" name="eat" value="飲食店"></td>
                             <td class="cell"><input type="submit" name="home" value="帰宅"></td>
-                            <td class="cell"><input type="submit" name="start" value="リセット"></td>
+                            <td class="cell"><input type="submit" name="move" value="移動"></td>
                         </tr>
                     </tbody></table>
                 </form>
