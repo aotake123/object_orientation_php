@@ -4,11 +4,12 @@ ini_set('log_errors','on');
 ini_set('error_log','php.log');
 session_start();
 
+require('function.php');
+
 //年月日表示用関数
 if(!empty($_SESSION)){
-    $firstTime = '20191201080000';  //初期設定値
+    $firstTime = '20191201080000';  //初期設定値 文字列型
 }else{
-    $firstTime = '';
 }
 $tmp = strtotime($firstTime);
 $week = array('日','月','火','水','木','金','土');
@@ -160,9 +161,9 @@ Class Customer extends Human{
 }
 
 abstract class Building{
-    public $spotName;    //場所の名前
-    public $spotImg;    //場所の画像
-    public $distance; //配達に必要な基本の距離(m)
+    public $spotName; 
+    public $spotImg;
+    public $distance;   //到達までに必要な基本距離(m)
     public function setSpotName($num11){
         $this->spotName = $num11;
     }
@@ -179,12 +180,16 @@ abstract class Building{
 
 
 Class Shop extends Building{
+    protected $itemWeight;
     protected $itemName; //渡す商品の名前
-    public function __construct($spotName, $spotImg, $distance, $itemName){
+    public function __construct($spotName, $spotImg, $distance, $itemWeight, $itemName){
         $this->name = $spotName;
         $this->img = $spotImg;
         $this->distance = $distance;
         $this->itemName = $itemName;
+    }
+    public function getSpotName(){
+        return $this->spotName;
     }
     public function getItemName(){
         return $this->itemName;
@@ -200,12 +205,23 @@ Class Home extends Building{
 
 Class Area{
     protected $areaName;
+    protected $areaImg;
     //時間毎に注文毎にかかる時間
     protected $orderTime_morning;
     protected $orderTime_evening;
     protected $orderTime_night;
+    public function __construct($areaName, $areaImg, $orderTime_morning, $orderTime_evening, $orderTime_night){
+        $this->areaName = $areaName;
+        $this->areaImg = $areaImg;
+        $this->morning = $orderTime_morning;
+        $this->evening = $orderTime_evening;
+        $this->night = $orderTime_night;
+    }
     public function getAreaName(){
         return $this->areaName;
+    }
+    public function getAreaImg(){
+        return $this->areaImg;
     }
     public function getMorning(){
         return $this->orderTime_morning;
@@ -234,15 +250,15 @@ class History{
 
 //インスタンス生成
 //配達員
-$deriver = new Driver('宇羽太郎', Sex::MAN,  30, 30, 100, 'img/driver01.png', 30, 30, 30, 30, 30);
+$deriver = new Driver('宇羽太郎', Sex::MAN,  30, 30, 100, 'img/driver01.png', 30, 30, 30, 30, 100);
 //ショップ一覧
-$shops[] = new Shop( 'マクドナルド', 'img/shop01.jpg', 10, Item::LIGHT);
-$shops[] = new Shop( 'タピオカ屋', 'img/shop02.jpg', 15, Item::LIGHT);
-$shops[] = new Shop( '吉野家', 'img/shop03.jpg', 15, Item::LIGHT);
-$shops[] = new Shop( '筋肉食堂', 'img/shop04.jpg', 15, Item::MIDDLE);
-$shops[] = new Shop( '松屋', 'img/shop05.jpg', 15, Item::MIDDLE);
-$shops[] = new Shop( 'オリジン弁当', 'img/shop06.jpg', 15, Item::MIDDLE);
-$shops[] = new Shop( 'ゴーゴーカレー', 'img/shop07.jpg', 15, Item::MIDDLE);
+$shops[] = new Shop( 'マクドナルド', 'img/shop01.jpg', 10, Item::LIGHT, 'ハンバーガー');
+$shops[] = new Shop( 'タピオカ屋', 'img/shop02.jpg', 15, Item::LIGHT, 'タピオカミルクティー');
+$shops[] = new Shop( '吉野家', 'img/shop03.jpg', 15, Item::LIGHT, '牛丼');
+$shops[] = new Shop( '筋肉食堂', 'img/shop04.jpg', 15, Item::MIDDLE, '日替わり弁当');
+$shops[] = new Shop( '松屋', 'img/shop05.jpg', 15, Item::MIDDLE, '牛めし');
+$shops[] = new Shop( 'オリジン弁当', 'img/shop06.jpg', 15, Item::MIDDLE, '幕内弁当');
+$shops[] = new Shop( 'ゴーゴーカレー', 'img/shop07.jpg', 15, Item::MIDDLE, 'メジャーカレー');
 //住宅一覧
 $homes[] = new Home( '木造住宅', 'img/home01.jpg', 400, HOUSE::WOOD);
 $homes[] = new Home( '鉄骨住宅', 'img/home02.jpg', 400, HOUSE::RC);
@@ -325,12 +341,15 @@ History::clear();
 if(!empty($_POST)){
     $startFlg = (!empty($_POST['start'])) ? true : false;   //初回スタート
     $pickFlg = (!empty($_POST['pick'])) ? true : false;   //集荷
+    $transFlg = (!empty($_POST['transport'])) ? true : false;   //配達
     $cycleFlg = (!empty($_POST['cycle'])) ? true : false;   //駐輪場
     $combiFlg = (!empty($_POST['combi'])) ? true : false;   //コンビニ
     $parkFlg = (!empty($_POST['park'])) ? true : false; //公園
     $eatFlg = (!empty($_POST['eat'])) ? true : false;   //飲食店
     $homeFlg = (!empty($_POST['home'])) ? true :false;  //帰宅
     error_log('POSTされた！');
+    debug($pickFlg);
+    debug($transFlg);
 
     if($startFlg){
         History::set('配達をスタートします！');
@@ -338,23 +357,22 @@ if(!empty($_POST)){
     }else{
         //集荷を押した場合
         if($pickFlg){
+            History::set($_SESSION['shop']->getSpotName().'の集荷に訪れた！');
+
             //集荷を発生させる
             //店に言って情報が読み込まれ、選択肢が変化する
+        }else if($transFlg){
         //配達を押した場合
+            $pickFlg = false;
             //配達員が消耗をする
             //売り上げ金額が上がる
+            History::set($_SESSION['shop']->getItemName().'の配送を完了した！');
+            createShop();
+            $_SESSION['DeriveryCount'] = $_SESSION['DeriveryCount']+1;
+
          //条件を満たした場合（体力ゼロ）はゲームオーバーとする
-            if($_SESSION['human']->getHp() <= 0){
-                gameOver();
          //24時を回った場合は日付を翌日の8時まで進める
-            }else{
-                //配達が完了したら、また次の配送を発生させる
-                if($_SESSION['human']->hp <= 0){
-                    History::set($_SESSION['shop']->itemName.'の配送を完了した！');
-                    createOrder();
-                    $_SESSION['DeriveryCount'] = $_SESSION['DeriveryCount']+1;
-                }
-            }
+
         }else if($cycleFlg){
             History::set('駐輪所に到着した！');
             $_SESSION['MINUTE'];     //時間を加算し、体力を低下させる
@@ -416,7 +434,21 @@ if(!empty($_POST)){
             <div class="header__date">
                 <?php echo date('Y年m月d日',$tmp); ?>(<?php echo $week[$weekNumber]; ?>)
             </div>
-            <div class="header__physical">(^_^)</div>
+            <div class="header__physical">
+                <?php
+                if($_SESSION['driver']->getPassion() >= 80){
+                    echo '絶好調';
+                }else if($_SESSION['driver']->getPassion() < 80 && $_SESSION['driver']->getPassion() >= 60){
+                    echo '好調';
+                }else if($_SESSION['driver']->getPassion() < 60 && $_SESSION['driver']->getPassion() >= 40){
+                    echo '普通';
+                }else if($_SESSION['driver']->getPassion() <40 || $_SESSION['driver']->getPassion() >= 20){
+                    echo '不調';
+                }else{
+                    echo '絶不調';
+                }
+                ?>
+            </div>
         </header>
         <div class="infomation">
             <div class="infoation__town">
@@ -430,7 +462,7 @@ if(!empty($_POST)){
                 </div>
                 <div class="information__w-change_picture window"></div>
                 <div class="information__w-status window">
-                    <p class="status_sentence">配達数：12</p>
+                    <p class="status_sentence">配達数：<?php echo $_SESSION['DeriveryCount']; ?></p>
                     <p class="status_sentence">満腹度：45/100%</p>
                     <p class="status_sentence">トイレ：35/100%</p>
                     <p class="status_sentence">自転車：34/47km</p>
@@ -445,8 +477,17 @@ if(!empty($_POST)){
                 <form method="post" class="footer__command-post">
                     <table class="footer__command-table"><tbody>
                         <tr>
-                            <?php if($_SESSION['pick'] === 1)  ?>
-                            <td class="cell" colspan="2"><input type="submit" name="pick" value="集荷" class="cell"></td>
+                            <?php
+                            if($pickFlg){
+                            ?>
+                                <td class="cell" colspan="2"><input type="submit" name="pick" value="集荷" class="cell"></td>
+                            <?php
+                            }else{
+                            ?>
+                                <td class="cell" colspan="2"><input type="submit" name="transport" value="配達" class="cell"></td>
+                            <?php
+                            } 
+                            ?>
                             <td class="cell"><input type="submit" name="cycle" value="駐輪所"></td>
                             <td class="cell"><input type="submit" name="combi" value="コンビニ"></td>
                         </tr>
