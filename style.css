@@ -95,14 +95,18 @@ body{
     flex-direction: row;
 }
 .informaiton__w-driver_picture{
-    width: 60px;
-    height: 60px;
-    margin: auto 10px 0 0;
+    width: 65px;
+    height: 65px;
+    margin: auto 15px 0 0;
+    border: 2px solid #FFFFFF;
+    border-radius: 3px;
 }
 .information__w-change_picture{
-    width: 60px;
-    height: 60px;
-    margin: auto 20px 0 0;
+    width: 65px;
+    height: 65px;
+    margin: auto 25px 0 0;
+    border: 2px solid #FFFFFF;
+    border-radius: 3px;
 }
 .informaiton__w-status{
     height: 150px;
@@ -125,7 +129,8 @@ body{
     border-radius: 3px;
 }
 .prof_image{
-    width: 120px;
+    width: 65px;
+    height: 65px;
 }
 
 /* footer */
