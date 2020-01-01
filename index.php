@@ -21,6 +21,10 @@ $weekNumber = date('w');
     $customers = array();    //住人一覧
     $areas = array();    //配送地域一覧
 
+    global $rightImg;
+    global $leftImg;
+
+
 class Sex{
     const MAN = 1;
     const WOMAN = 2;
@@ -49,7 +53,6 @@ class HOUSE{
     const TOWER = 4;
 }
 
-//配達員、お客さんの上位の抽象クラス
 abstract Class Human{ 
     abstract public function SayMessage();
     protected $name;
@@ -183,14 +186,12 @@ Class Shop extends Building{
     protected $itemWeight;
     protected $itemName; //渡す商品の名前
     public function __construct($spotName, $spotImg, $distance, $itemWeight, $itemName){
-        $this->name = $spotName;
-        $this->img = $spotImg;
+        $this->spotName = $spotName;
+        $this->spotImg = $spotImg;
         $this->distance = $distance;
+        $this->itemWeight = $itemWeight;
         $this->itemName = $itemName;
-    }
-    public function getSpotName(){
-        return $this->spotName;
-    }
+        }
     public function getItemName(){
         return $this->itemName;
     }
@@ -250,15 +251,19 @@ class History{
 
 //インスタンス生成
 //配達員
-$deriver = new Driver('宇羽太郎', Sex::MAN,  30, 30, 100, 'img/driver01.png', 30, 30, 30, 30, 100);
+$driver = new Driver('宇羽太郎', Sex::MAN,  30, 30, 100, 'img/driver01.png', 30, 30, 100, 30, 100);
+debug('配達員データ：'.print_r($driver,true));
+
+
 //ショップ一覧
-$shops[] = new Shop( 'マクドナルド', 'img/shop01.jpg', 10, Item::LIGHT, 'ハンバーガー');
-$shops[] = new Shop( 'タピオカ屋', 'img/shop02.jpg', 15, Item::LIGHT, 'タピオカミルクティー');
+$shops[] = new Shop( 'マクドナルド', 'img/shop01.jpeg', 10, Item::LIGHT, 'ハンバーガー');
+$shops[] = new Shop( 'タピオカ屋', 'img/shop02.jpeg', 15, Item::LIGHT, 'タピオカミルクティー');
 $shops[] = new Shop( '吉野家', 'img/shop03.jpg', 15, Item::LIGHT, '牛丼');
 $shops[] = new Shop( '筋肉食堂', 'img/shop04.jpg', 15, Item::MIDDLE, '日替わり弁当');
 $shops[] = new Shop( '松屋', 'img/shop05.jpg', 15, Item::MIDDLE, '牛めし');
 $shops[] = new Shop( 'オリジン弁当', 'img/shop06.jpg', 15, Item::MIDDLE, '幕内弁当');
 $shops[] = new Shop( 'ゴーゴーカレー', 'img/shop07.jpg', 15, Item::MIDDLE, 'メジャーカレー');
+
 //住宅一覧
 $homes[] = new Home( '木造住宅', 'img/home01.jpg', 400, HOUSE::WOOD);
 $homes[] = new Home( '鉄骨住宅', 'img/home02.jpg', 400, HOUSE::RC);
@@ -297,12 +302,15 @@ function movingPoint(){
 }
 
 function createDriver(){
-    global $deriver;
-    $_SESSION['driver'] = $deriver;
+    global $driver;
+    $_SESSION['driver'] = $driver;
+    debug('配達員データ：'.print_r($_SESSION['driver'],true));
+
 }
 function createShop(){
     global $shops;
-    $shop = $shops[mt_rand(0,6)];
+    $shop = $shops[mt_rand(0,1)];
+    $transFlg = "";
     History::set('アプリから注文が入りました！');
     $_SESSION['shop'] = $shop;
 }
@@ -327,7 +335,7 @@ function createArea(){
 function init(){
     History::clear();
     History::set('配達の仕事を開始します！');
-    $_SESSION['DeriveryCount'] = 0;
+    $_SESSION['DriveryCount'] = 0;
     createDriver();
     createShop();
 }
@@ -348,8 +356,6 @@ if(!empty($_POST)){
     $eatFlg = (!empty($_POST['eat'])) ? true : false;   //飲食店
     $homeFlg = (!empty($_POST['home'])) ? true :false;  //帰宅
     error_log('POSTされた！');
-    debug($pickFlg);
-    debug($transFlg);
 
     if($startFlg){
         History::set('配達をスタートします！');
@@ -358,17 +364,15 @@ if(!empty($_POST)){
         //集荷を押した場合
         if($pickFlg){
             History::set($_SESSION['shop']->getSpotName().'の集荷に訪れた！');
-
             //集荷を発生させる
             //店に言って情報が読み込まれ、選択肢が変化する
         }else if($transFlg){
         //配達を押した場合
-            $pickFlg = false;
             //配達員が消耗をする
             //売り上げ金額が上がる
             History::set($_SESSION['shop']->getItemName().'の配送を完了した！');
             createShop();
-            $_SESSION['DeriveryCount'] = $_SESSION['DeriveryCount']+1;
+            $_SESSION['DriveryCount'] = $_SESSION['DriveryCount']+1;
 
          //条件を満たした場合（体力ゼロ）はゲームオーバーとする
          //24時を回った場合は日付を翌日の8時まで進める
@@ -399,7 +403,7 @@ if(!empty($_POST)){
             //新たな集荷を発生させる
         }else{
             //リセットを押してゲーム初期化
-            $_POST = array();
+            init();
         }
     } 
     $_POST = array();
@@ -442,7 +446,7 @@ if(!empty($_POST)){
                     echo '好調';
                 }else if($_SESSION['driver']->getPassion() < 60 && $_SESSION['driver']->getPassion() >= 40){
                     echo '普通';
-                }else if($_SESSION['driver']->getPassion() <40 || $_SESSION['driver']->getPassion() >= 20){
+                }else if($_SESSION['driver']->getPassion() < 40 && $_SESSION['driver']->getPassion() >= 20){
                     echo '不調';
                 }else{
                     echo '絶不調';
@@ -455,16 +459,21 @@ if(!empty($_POST)){
                 <div class="information__town-name">現在地 >> 新宿</div>
             </div>
             <div class="infomation__wrap">
-                <div class="informaiton__w-driver_picture window">
+                <div class="informaiton__w-driver_picture">
                     <div>
-                        <img class="prof_image" src="<?php $_SESSION['driver']->getFaceImg(); ?>">
+                        <img class="prof_image" src="<?php echo $_SESSION['driver']->getFaceImg(); ?>">
                     </div>
                 </div>
-                <div class="information__w-change_picture window"></div>
+                <div class="information__w-change_picture">
+                    <div>
+                        <img class="prof_image" src="<?php echo $_SESSION['shop']->getSpotImg(); ?>">
+                    </div>
+                </div>
                 <div class="information__w-status window">
                     <p class="status_sentence">配達数：<?php echo $_SESSION['DeriveryCount']; ?></p>
-                    <p class="status_sentence">満腹度：45/100%</p>
-                    <p class="status_sentence">トイレ：35/100%</p>
+                    <p class="status_sentence">体力：<?php echo $_SESSION['driver']->getHp(); ?>/100</p>
+                    <p class="status_sentence">満腹度：<?php echo $_SESSION['driver']->getHungry(); ?>/100%</p>
+                    <p class="status_sentence">トイレ：<?php echo $_SESSION['driver']->getWater(); ?>/100%</p>
                     <p class="status_sentence">自転車：34/47km</p>
                 </div>
             </div>
@@ -478,24 +487,25 @@ if(!empty($_POST)){
                     <table class="footer__command-table"><tbody>
                         <tr>
                             <?php
-                            if($pickFlg){
+                            if(empty($pickFlg)){
                             ?>
-                                <td class="cell" colspan="2"><input type="submit" name="pick" value="集荷" class="cell"></td>
+                                <td class="cell"><input type="submit" name="pick" value="集荷" class="cell"></td>
                             <?php
                             }else{
                             ?>
-                                <td class="cell" colspan="2"><input type="submit" name="transport" value="配達" class="cell"></td>
+                                <td class="cell"><input type="submit" name="transport" value="配達" class="cell"></td>
                             <?php
                             } 
                             ?>
                             <td class="cell"><input type="submit" name="cycle" value="駐輪所"></td>
                             <td class="cell"><input type="submit" name="combi" value="コンビニ"></td>
+                            <td class="cell"><input type="submit" name="park" value="公園"></td>
                         </tr>
                         <tr>
-                            <td class="cell"><input type="submit" name="park" value="公園"></td>
                             <td class="cell"><input type="submit" name="eat" value="飲食店"></td>
                             <td class="cell"><input type="submit" name="home" value="帰宅"></td>
                             <td class="cell"><input type="submit" name="move" value="移動"></td>
+                            <td class="cell"><input type="submit" name="reset" value="リセット"></td>
                         </tr>
                     </tbody></table>
                 </form>
