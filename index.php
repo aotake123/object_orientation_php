@@ -21,10 +21,6 @@ $weekNumber = date('w');
     $customers = array();    //住人一覧
     $areas = array();    //配送地域一覧
 
-    global $rightImg;
-    global $leftImg;
-
-
 class Sex{
     const MAN = 1;
     const WOMAN = 2;
@@ -239,10 +235,12 @@ Class Area{
 //履歴管理クラス
 class History{
     public static function set($str){
-        //セッションhistoryが作られていなければ作る
         if(empty($_SESSION['history'])) $_SESSION['history'] = '';
-        //文字列をセッションhistoryへ格納
         $_SESSION['history'] .= $str.'<br>';
+    }
+    public static function setNotBr($str){
+        if(empty($_SESSION['history'])) $_SESSION['history'] = '';
+        $_SESSION['history'] .= $str;
     }
     public static function clear(){
         unset($_SESSION['history']);
@@ -252,8 +250,6 @@ class History{
 //インスタンス生成
 //配達員
 $driver = new Driver('宇羽太郎', Sex::MAN,  30, 30, 100, 'img/driver01.png', 30, 30, 100, 30, 100);
-debug('配達員データ：'.print_r($driver,true));
-
 
 //ショップ一覧
 $shops[] = new Shop( 'マクドナルド', 'img/shop01.jpeg', 10, Item::LIGHT, 'ハンバーガー');
@@ -295,10 +291,15 @@ $areas[] = new Area( '青山一丁目', 'img/area13.jpg', 20, 15, 25);
 $areas[] = new Area( '神宮前', 'img/area14.jpg', 20, 20, 20);
 $areas[] = new Area( '代々木', 'img/area15.jpg', 15, 10, 15);
 
-function movingPoint(){
+
+function moving(){
     //移動距離をランダムに決定
+    $_SESSION['distance'] = mt_rand(0,$_SESSION['distance']);
     //距離に応じて減る体力を決定
     //距離に応じて経過する時間を決定
+    //距離に応じて減るやる気を決定
+    //距離に応じて減る空腹度を決定
+    //距離に応じて
 }
 
 function createDriver(){
@@ -313,12 +314,14 @@ function createShop(){
     $transFlg = "";
     History::set('アプリから注文が入りました！');
     $_SESSION['shop'] = $shop;
+    $_SESSION['distance'] = $_SESSION['shop']->getDistance();
 }
 function createHome(){
     global $homes;
     $home = $homes[mt_rand(0,1)];
-    History::set('〜に配達に訪れました！！');
+    $_SESSION['home'] = $home;
 }
+
 function createCustomer(){
     global $customers;
     $customer = $customers[mt_rand(0,1)];
@@ -328,8 +331,10 @@ function createCustomer(){
 function createArea(){
     global $areas;
     $area = $areas[mt_rand(0,1)];
-    History::set('〜に移動しました！！');
+    debug('エリアデータ：'.print_r($area,true));
+    debug('エリアデータ：'.print_r($areas,true));
     $_SESSION['area'] = $area;
+
 }
 
 function init(){
@@ -338,6 +343,7 @@ function init(){
     $_SESSION['DriveryCount'] = 0;
     createDriver();
     createShop();
+    createArea();
 }
 function gameOver(){
     $_SESSION = array();
@@ -368,6 +374,8 @@ if(!empty($_POST)){
             //店に言って情報が読み込まれ、選択肢が変化する
         }else if($transFlg){
         //配達を押した場合
+            createHome();
+            createCustomer();
             //配達員が消耗をする
             //売り上げ金額が上がる
             History::set($_SESSION['shop']->getItemName().'の配送を完了した！');
@@ -454,7 +462,10 @@ if(!empty($_POST)){
                 ?>
             </div>
         </header>
-        <div class="infomation">
+        <div class="infomation" style="
+        background-image: url(<?php echo $_SESSION['area']->getAreaImg(); ?>);
+        background-size: cover;
+        ">
             <div class="infoation__town">
                 <div class="information__town-name">現在地 >> 新宿</div>
             </div>

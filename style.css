@@ -126,6 +126,7 @@ body{
 .window{
     padding: 5px;
     border: 2px solid #FFFFFF;
+    background: #1e1e1e;
     border-radius: 3px;
 }
 .prof_image{
