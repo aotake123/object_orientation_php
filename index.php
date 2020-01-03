@@ -249,8 +249,7 @@ class History{
 
 //インスタンス生成
 //配達員
-$driver = new Driver('宇羽太郎', Sex::MAN,  30, 30, 100, 'img/driver01.png', 30, 30, 100, 30, 100);
-
+$driver = new Driver('宇羽太郎', Sex::MAN,  30, 30, 100, 'img/driver01.png', 30, 30, 50, 30, 50);
 //ショップ一覧
 $shops[] = new Shop( 'マクドナルド', 'img/shop01.jpeg', 10, Item::LIGHT, 'ハンバーガー');
 $shops[] = new Shop( 'タピオカ屋', 'img/shop02.jpeg', 15, Item::LIGHT, 'タピオカミルクティー');
@@ -259,7 +258,6 @@ $shops[] = new Shop( '筋肉食堂', 'img/shop04.jpg', 15, Item::MIDDLE, '日替
 $shops[] = new Shop( '松屋', 'img/shop05.jpg', 15, Item::MIDDLE, '牛めし');
 $shops[] = new Shop( 'オリジン弁当', 'img/shop06.jpg', 15, Item::MIDDLE, '幕内弁当');
 $shops[] = new Shop( 'ゴーゴーカレー', 'img/shop07.jpg', 15, Item::MIDDLE, 'メジャーカレー');
-
 //住宅一覧
 $homes[] = new Home( '木造住宅', 'img/home01.jpg', 400, HOUSE::WOOD);
 $homes[] = new Home( '鉄骨住宅', 'img/home02.jpg', 400, HOUSE::RC);
@@ -331,8 +329,6 @@ function createCustomer(){
 function createArea(){
     global $areas;
     $area = $areas[mt_rand(0,1)];
-    debug('エリアデータ：'.print_r($area,true));
-    debug('エリアデータ：'.print_r($areas,true));
     $_SESSION['area'] = $area;
 
 }
@@ -449,15 +445,15 @@ if(!empty($_POST)){
             <div class="header__physical">
                 <?php
                 if($_SESSION['driver']->getPassion() >= 80){
-                    echo '絶好調';
+                    echo '<img src="img/yaruki01.gif">';
                 }else if($_SESSION['driver']->getPassion() < 80 && $_SESSION['driver']->getPassion() >= 60){
-                    echo '好調';
+                    echo '<img src="img/yaruki02.gif">';
                 }else if($_SESSION['driver']->getPassion() < 60 && $_SESSION['driver']->getPassion() >= 40){
-                    echo '普通';
+                    echo '<img src="img/yaruki03.gif">';
                 }else if($_SESSION['driver']->getPassion() < 40 && $_SESSION['driver']->getPassion() >= 20){
-                    echo '不調';
+                    echo '<img src="img/yaruki04.gif">';
                 }else{
-                    echo '絶不調';
+                    echo '<img src="img/yaruki05.gif">';
                 }
                 ?>
             </div>
