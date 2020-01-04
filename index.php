@@ -25,11 +25,6 @@ class Sex{
     const MAN = 1;
     const WOMAN = 2;
 }
-class Weather{
-    const HARE = 1;
-    const KUMORI = 2;
-    const AME = 3;
-}
 class Item{
     const LIGHT = 1;
     const MIDDLE = 2;
@@ -70,27 +65,25 @@ abstract Class Human{
 Class Driver extends Human{ 
      protected $clock;  //現在時刻
      protected $hp;   //体力
-     protected $power;    //筋力
      protected $faceimg;  //配達員画像
      protected $hungry;   //満腹度
-     protected $water;    //喉の乾き
      protected $toilet;   //トイレ危険度
      protected $money;    //所持金
      protected $passion;  //やる気
+     protected $bike;   //自転車電池残量
      public function SayMessage(){
      }
-     public function __construct($name, $sex, $clock, $hp, $power, $faceimg, $hungry, $water, $toilet, $money, $passion){
+     public function __construct($name, $sex, $clock, $hp, $faceimg, $hungry, $toilet, $money, $passion, $bike){
         $this->name = $name;
         $this->sex = $sex;
         $this->clock = $clock;
         $this->hp  = $hp;
-        $this->power = $power;
         $this->faceimg  = $faceimg;
         $this->hungry = $hungry;
-        $this->water  = $water;
         $this->toilet  = $toilet;
         $this->money  = $money;
         $this->passion = $passion;
+        $this->bike = $bike;
      }
      public function setClock($num2){
          $this->clock = $num2;
@@ -104,12 +97,6 @@ Class Driver extends Human{
      public function getHp(){
          return $this->hp;
      }
-     public function setPower($num4){
-         $this->power = $num4;
-     }
-     public function getPower(){
-         return $this->power;
-     }
      public function getFaceImg(){
          return $this->faceimg;
      }
@@ -119,19 +106,13 @@ Class Driver extends Human{
      public function getHungry(){
          return $this->hungry;
      }
-     public function setWater($num6){
-         $this->water = $num6;
-     }
-     public function getWater(){
-         return $this->water;
-     }
      public function setToilet($num7){
          $this->toilet = $num7;
      }
      public function getToilet(){
          return $this->toilet;
      }
-     public function setmoney($num8){
+     public function setMoney($num8){
          $this->toilet = $num8;
      }
      public function getMoney(){
@@ -142,6 +123,12 @@ Class Driver extends Human{
      }
      public function getPassion(){
          return $this->passion;
+     }
+     public function setBike($num10){
+         $this->bike = $num10;
+     }
+     public function getBike(){
+         return $this->bike;
      }
  }
 
@@ -249,7 +236,7 @@ class History{
 
 //インスタンス生成
 //配達員
-$driver = new Driver('宇羽太郎', Sex::MAN,  30, 30, 100, 'img/driver01.png', 30, 30, 50, 30, 50);
+$driver = new Driver('宇羽太郎', Sex::MAN, 30, 100, 'img/driver01.png', 100, 100, 30, 50, 47);
 //ショップ一覧
 $shops[] = new Shop( 'マクドナルド', 'img/shop01.jpeg', 10, Item::LIGHT, 'ハンバーガー');
 $shops[] = new Shop( 'タピオカ屋', 'img/shop02.jpeg', 15, Item::LIGHT, 'タピオカミルクティー');
@@ -323,8 +310,8 @@ function createHome(){
 function createCustomer(){
     global $customers;
     $customer = $customers[mt_rand(0,1)];
-    History::set('〜が玄関口から現れた！！');
     $_SESSION['customer'] = $customer;
+    History::set($_SESSION['customer']->getName().'が玄関口から現れた！！');
 }
 function createArea(){
     global $areas;
@@ -442,28 +429,30 @@ if(!empty($_POST)){
             <div class="header__date">
                 <?php echo date('Y年m月d日',$tmp); ?>(<?php echo $week[$weekNumber]; ?>)
             </div>
-            <div class="header__physical">
+            <div class="header__physical"><span class="header__physical--name">やる気 </span>
                 <?php
                 if($_SESSION['driver']->getPassion() >= 80){
-                    echo '<img src="img/yaruki01.gif">';
+                    echo '<img src="img/yaruki01.gif" class="yaruki_gif">';
                 }else if($_SESSION['driver']->getPassion() < 80 && $_SESSION['driver']->getPassion() >= 60){
-                    echo '<img src="img/yaruki02.gif">';
+                    echo '<img src="img/yaruki02.gif" class="yaruki_gif">';
                 }else if($_SESSION['driver']->getPassion() < 60 && $_SESSION['driver']->getPassion() >= 40){
-                    echo '<img src="img/yaruki03.gif">';
+                    echo '<img src="img/yaruki03.gif" class="yaruki_gif">';
                 }else if($_SESSION['driver']->getPassion() < 40 && $_SESSION['driver']->getPassion() >= 20){
-                    echo '<img src="img/yaruki04.gif">';
+                    echo '<img src="img/yaruki04.gif" class="yaruki_gif">';
                 }else{
-                    echo '<img src="img/yaruki05.gif">';
+                    echo '<img src="img/yaruki05.gif" class="yaruki_gif">';
                 }
                 ?>
             </div>
         </header>
         <div class="infomation" style="
-        background-image: url(<?php echo $_SESSION['area']->getAreaImg(); ?>);
-        background-size: cover;
-        ">
+                background-image: url(<?php echo $_SESSION['area']->getAreaImg(); ?>);
+                background-size: cover;
+               ">
             <div class="infoation__town">
-                <div class="information__town-name">現在地 >> 新宿</div>
+                <div class="information__town-name">
+                    現在地 >> <?php echo $_SESSION['area']->getAreaName(); ?>
+                　　　　本日の売上金：99999円</div>
             </div>
             <div class="infomation__wrap">
                 <div class="informaiton__w-driver_picture">
@@ -480,8 +469,8 @@ if(!empty($_POST)){
                     <p class="status_sentence">配達数：<?php echo $_SESSION['DeriveryCount']; ?></p>
                     <p class="status_sentence">体力：<?php echo $_SESSION['driver']->getHp(); ?>/100</p>
                     <p class="status_sentence">満腹度：<?php echo $_SESSION['driver']->getHungry(); ?>/100%</p>
-                    <p class="status_sentence">トイレ：<?php echo $_SESSION['driver']->getWater(); ?>/100%</p>
-                    <p class="status_sentence">自転車：34/47km</p>
+                    <p class="status_sentence">トイレ：<?php echo $_SESSION['driver']->getToilet(); ?>/100%</p>
+                    <p class="status_sentence">自転車：<?php echo $_SESSION['driver']->getBike(); ?>/50km</p>
                 </div>
             </div>
             <div class="information__history window">

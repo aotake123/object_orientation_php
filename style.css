@@ -9,7 +9,7 @@ h1{
     text-align: left;
 }
 h2{ 
-    color: white;
+    color: #FFFFFF;
     font-size: 16px;
     text-align: center;
 }
@@ -25,7 +25,6 @@ body{
 
 /* main */
 .main{
-    background:#000000;
     border: 2px solid #1e1e1e;
     border-radius: 3px;
     position:relative;
@@ -37,7 +36,7 @@ body{
 
 /* header */
 .header{
-    background-color: #FFFFFF;
+    background-color: #123498;
     position: relative;
     overflow: hidden;
 }
@@ -46,38 +45,48 @@ body{
     background: #FFFFFF;
 }
 .header__clock{
-    font-size: 13px;
+    font-size: 12px;
     position: absolute;
     padding: 5px 15px;
-    width: 80px;
     border-radius: 0 8px 8px 0;
     background: #545454;
     z-index: 5;
     display: inline-block;
 }
 .header__date{
-    width: 240px;
+    width: 200px;
     padding: 5px 15px;
     text-align: right;
     font-size: 12px;
-    background-color: aquamarine;
+    background-color: #123498;
     float: left;
 }
 .header__physical{
-    font-size: 12px;
+    font-size: 13px;
     text-align: left;
-    padding: 5px 15px 5px 20px;
-    background-color: aqua;
+    line-height: 13px;
+    padding: 5px 15px;
+    background-color: #123498;
+    display: block;
+    float: left;
+    overflow: hidden;
+}
+.header__physical--name{
+    padding-top: 2px;
+    display: block;
     float: left;
 }
-
+.yaruki_gif{
+    margin-left: 5px;
+    float: left;
+}
 
 /* infomation */
 .infomation{
     padding: 5px 10px;
     position: relative;
 }
-.infoation__town{
+.infomation__town{
     text-align: left;
 }
 .information__town-name{
@@ -87,6 +96,7 @@ body{
     margin-bottom: 5px; 
     border: 2px solid #FFFFFF;
     border-radius: 3px;
+    background-color: rgba(30, 30, 30, 0.7);
 }
 .infomation__wrap{
     padding: 0 10px;
@@ -99,17 +109,19 @@ body{
     height: 65px;
     margin: auto 15px 0 0;
     border: 2px solid #FFFFFF;
+    background-color: rgba(30, 30, 30, 0.7);
     border-radius: 3px;
 }
 .information__w-change_picture{
     width: 65px;
     height: 65px;
-    margin: auto 25px 0 0;
+    margin: auto 15px 0 0;
     border: 2px solid #FFFFFF;
     border-radius: 3px;
 }
 .informaiton__w-status{
     height: 150px;
+    width: 120px;
     margin: 10px 0;
 }
 .status_sentence{
@@ -126,7 +138,7 @@ body{
 .window{
     padding: 5px;
     border: 2px solid #FFFFFF;
-    background: #1e1e1e;
+    background-color: rgba(30, 30, 30, 0.7);
     border-radius: 3px;
 }
 .prof_image{
@@ -136,7 +148,8 @@ body{
 
 /* footer */
 .footer{
-    padding: 0 10px;
+    padding: 5 10px;
+    background-color: #013791;
 }
 .footer__history{
     width: 300px;
@@ -162,7 +175,7 @@ input[type="submit"]{
     font-size: 14px;
     padding: 5px 10px;
     margin-bottom: 5px;
-    background: black;
+    background: #123498;
     border: 2px solid #FFFFFF;
     border-radius: 3px;
     color: white;
