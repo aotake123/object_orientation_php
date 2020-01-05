@@ -49,7 +49,7 @@ body{
     position: absolute;
     padding: 5px 15px;
     border-radius: 0 8px 8px 0;
-    background: #545454;
+    background: #11bbf8;
     z-index: 5;
     display: inline-block;
 }
@@ -109,7 +109,7 @@ body{
     height: 65px;
     margin: auto 15px 0 0;
     border: 2px solid #FFFFFF;
-    background-color: rgba(30, 30, 30, 0.7);
+    background-color: rgba(30, 30, 30, 0.3);
     border-radius: 3px;
 }
 .information__w-change_picture{
@@ -175,13 +175,13 @@ input[type="submit"]{
     font-size: 14px;
     padding: 5px 10px;
     margin-bottom: 5px;
-    background: #123498;
+    background: #3566c7;
     border: 2px solid #FFFFFF;
     border-radius: 3px;
     color: white;
 }
 input[type="submit"]:hover{
-    background: #3d3938;
+    background: #92c8f0;
     cursor: pointer;
 }
 a{
