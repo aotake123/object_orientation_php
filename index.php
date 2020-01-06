@@ -7,7 +7,7 @@ session_start();
 require('function.php');
 
 //年月日表示用関数
-if(!empty($_SESSION)){
+if(empty($_SESSION)){
     $firstTime = '20191201080000';  //初期設定値 文字列型
 }else{
 }
@@ -236,7 +236,7 @@ class History{
 
 //インスタンス生成
 //配達員
-$driver = new Driver('宇羽太郎', Sex::MAN, 30, 100, 'img/driver01.png', 100, 100, 30, 50, 47);
+$driver = new Driver('宇羽太郎', Sex::MAN, 30, 100, 'img/driver01.png', 100, 100, 30, 100, 50);
 //ショップ一覧
 $shops[] = new Shop( 'マクドナルド', 'img/shop01.jpeg', 10, Item::LIGHT, 'ハンバーガー');
 $shops[] = new Shop( 'タピオカ屋', 'img/shop02.jpeg', 15, Item::LIGHT, 'タピオカミルクティー');
@@ -277,14 +277,15 @@ $areas[] = new Area( '神宮前', 'img/area14.jpg', 20, 20, 20);
 $areas[] = new Area( '代々木', 'img/area15.jpg', 15, 10, 15);
 
 
-function moving(){
+function moving($targetObj){
     //移動距離をランダムに決定
     $_SESSION['distance'] = mt_rand(0,$_SESSION['distance']);
-    //距離に応じて減る体力を決定
-    //距離に応じて経過する時間を決定
-    //距離に応じて減るやる気を決定
-    //距離に応じて減る空腹度を決定
-    //距離に応じて
+    //ドライバーが移動して体力を失う(40配送で体力が尽きる、1配送で2.5ポイント、1移動で1.25ポイント減る)
+    $_SESSION['driver']->setHp($_SESSION['driver']->getHp()); //移動距離*2.5ポイント
+    //距離に応じて経過する時間を決定（1配送で20分、1移動毎に平均10分経過する）
+    //距離に応じて減るやる気を決定（40配送でやる気ゼロ、1配送毎に2.5%、1移動毎に平均1.25%減っていく）
+    //距離に応じて減る空腹度を決定（20配送で空腹、1配送毎に平均5%、1移動毎に平均2.5%減っていく）
+    //距離に応じて自転車の電池残量を減らす(1配送で3km、1移動毎に1.5km減っていく)
 }
 
 function createDriver(){
@@ -295,11 +296,15 @@ function createDriver(){
 }
 function createShop(){
     global $shops;
+    debug('$shopsデータ：'.print_r($shops,true));
     $shop = $shops[mt_rand(0,1)];
+    debug('$shopデータ：'.print_r($shop,true));
+
     $transFlg = "";
     History::set('アプリから注文が入りました！');
     $_SESSION['shop'] = $shop;
     $_SESSION['distance'] = $_SESSION['shop']->getDistance();
+
 }
 function createHome(){
     global $homes;
@@ -323,10 +328,18 @@ function createArea(){
 function init(){
     History::clear();
     History::set('配達の仕事を開始します！');
-    $_SESSION['DriveryCount'] = 0;
     createDriver();
     createShop();
     createArea();
+    $_SESSION['DriveryCount'] = 0;  //配達回数
+    $_SESSION['yen'] = 0;   //本日の売上
+    $_SESSION['bike'] = 50; //自転車電池残量
+    $_SESSION['manpuku'] = 100;     //満腹度
+    $_SESSION['toilet'] = 100;  //トイレ安全度
+    $_SESSION['driver']->setHp(100);    //HP初期化
+    $_SESSION['driver']->setHungry(100);    //満腹度初期化
+    $_SESSION['driver']->setToilet(100);    //トイレ危険度初期化
+    $_SESSION['driver']->setBike(100);      //バイク残量初期化
 }
 function gameOver(){
     $_SESSION = array();
@@ -412,7 +425,7 @@ if(!empty($_POST)){
 
   <body>
     <div class="main">
-      <?php if(empty($_SESSION) || !empty($_SESSION['start'])){ ?>
+      <?php if(empty($_SESSION)){ ?>
       <div class="top__image">
         <h1 class="subject">配達シュミレータ</h1>
         <h2>GAME START ?</h2>
@@ -466,7 +479,7 @@ if(!empty($_POST)){
                     </div>
                 </div>
                 <div class="information__w-status window">
-                    <p class="status_sentence">配達数：<?php echo $_SESSION['DeriveryCount']; ?></p>
+                    <p class="status_sentence">配達数：<?php echo $_SESSION['DriveryCount']; ?></p>
                     <p class="status_sentence">体力：<?php echo $_SESSION['driver']->getHp(); ?>/100</p>
                     <p class="status_sentence">満腹度：<?php echo $_SESSION['driver']->getHungry(); ?>/100%</p>
                     <p class="status_sentence">トイレ：<?php echo $_SESSION['driver']->getToilet(); ?>/100%</p>
