@@ -7,7 +7,11 @@ h1{
     color: #1e1e1e;
     font-size: 20px;
     text-align: left;
+    margin-bottom: 3px;
+    border-bottom: 2px solid #03798A;
+    display: inline-block;
 }
+
 h2{ 
     color: #FFFFFF;
     font-size: 16px;
@@ -43,13 +47,14 @@ body{
 .subject{
     padding: 5px 15px;
     background: #FFFFFF;
+    overflow: hidden;
 }
 .header__clock{
     font-size: 12px;
     position: absolute;
     padding: 5px 15px;
     border-radius: 0 8px 8px 0;
-    background: #11bbf8;
+    background: #2D4DAB;
     z-index: 5;
     display: inline-block;
 }
@@ -94,7 +99,7 @@ body{
     padding: 5px 15px;
     margin-top: 5px;
     margin-bottom: 5px; 
-    border: 2px solid #FFFFFF;
+    border: 2px solid #d8d8d8;
     border-radius: 3px;
     background-color: rgba(30, 30, 30, 0.7);
 }
@@ -108,7 +113,7 @@ body{
     width: 65px;
     height: 65px;
     margin: auto 15px 0 0;
-    border: 2px solid #FFFFFF;
+    border: 2px solid #d8d8d8;
     background-color: rgba(30, 30, 30, 0.3);
     border-radius: 3px;
 }
@@ -116,7 +121,7 @@ body{
     width: 65px;
     height: 65px;
     margin: auto 15px 0 0;
-    border: 2px solid #FFFFFF;
+    border: 2px solid #d8d8d8;
     border-radius: 3px;
 }
 .informaiton__w-status{
@@ -137,7 +142,7 @@ body{
 
 .window{
     padding: 5px;
-    border: 2px solid #FFFFFF;
+    border: 2px solid #d8d8d8;
     background-color: rgba(30, 30, 30, 0.7);
     border-radius: 3px;
 }
@@ -175,13 +180,13 @@ input[type="submit"]{
     font-size: 14px;
     padding: 5px 10px;
     margin-bottom: 5px;
-    background: #3566c7;
+    background: #2D4DAB;
     border: 2px solid #FFFFFF;
     border-radius: 3px;
     color: white;
 }
 input[type="submit"]:hover{
-    background: #92c8f0;
+    background: #4D68B7;
     cursor: pointer;
 }
 a{
