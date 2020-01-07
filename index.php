@@ -36,6 +36,10 @@ class MESSAGE{
     const Positive_Deli3 = 毎度です！UBERです！;
     const Positive_shop1 = 配達お願いします！;
     const Positive_shop2 = よろしくお願いします！;
+    const Positive_cust1 = ありがとう！;
+    const Positive_cust2 = おおきに！;
+    const Positive_cust3 = お疲れ様。配送頑張ってね！;
+
 }
 class HOUSE{
     const WOOD = 1;
@@ -277,8 +281,9 @@ $areas[] = new Area( '神宮前', 'img/area14.jpg', 20, 20, 20);
 $areas[] = new Area( '代々木', 'img/area15.jpg', 15, 10, 15);
 
 
-function moving($targetObj){
-    //移動距離をランダムに決定
+function moving($spotVal,$builVal,$carryVal,$areaVal){  //店舗係数、建物係数、荷物係数、エリア係数
+    //移動距離の設計
+    //移動距離をランダムに増減させて合計から差し引く
     $_SESSION['distance'] = mt_rand(0,$_SESSION['distance']);
     //ドライバーが移動して体力を失う(40配送で体力が尽きる、1配送で2.5ポイント、1移動で1.25ポイント減る)
     $_SESSION['driver']->setHp($_SESSION['driver']->getHp()); //移動距離*2.5ポイント
@@ -291,15 +296,14 @@ function moving($targetObj){
 function createDriver(){
     global $driver;
     $_SESSION['driver'] = $driver;
-    debug('配達員データ：'.print_r($_SESSION['driver'],true));
+    //debug('配達員データ：'.print_r($_SESSION['driver'],true));
 
 }
 function createShop(){
     global $shops;
-    debug('$shopsデータ：'.print_r($shops,true));
+    //debug('$shopsデータ：'.print_r($shops,true));
     $shop = $shops[mt_rand(0,1)];
-    debug('$shopデータ：'.print_r($shop,true));
-
+    //debug('$shopデータ：'.print_r($shop,true));
     $transFlg = "";
     History::set('アプリから注文が入りました！');
     $_SESSION['shop'] = $shop;
@@ -322,7 +326,9 @@ function createArea(){
     global $areas;
     $area = $areas[mt_rand(0,1)];
     $_SESSION['area'] = $area;
-
+}
+function getMoney(){
+    $_SESSION['yen'] = $_SESSION['yen'] + 500;
 }
 
 function init(){
@@ -374,6 +380,7 @@ if(!empty($_POST)){
             createCustomer();
             //配達員が消耗をする
             //売り上げ金額が上がる
+            getMoney();
             History::set($_SESSION['shop']->getItemName().'の配送を完了した！');
             createShop();
             $_SESSION['DriveryCount'] = $_SESSION['DriveryCount']+1;
@@ -427,13 +434,15 @@ if(!empty($_POST)){
     <div class="main">
       <?php if(empty($_SESSION)){ ?>
       <div class="top__image">
-        <h1 class="subject">配達シュミレータ</h1>
-        <h2>GAME START ?</h2>
-        <div class="top__button">
-            <form method="post">
-            <input type="submit" name="start" value="▶ゲームスタート">
-            </form>
-        </div>
+        <header>
+            <h1 class="subject">配達シュミレータ</h1>
+            <h2>GAME START ?</h2>
+            <div class="top__button">
+                <form method="post">
+                <input type="submit" name="start" value="▶ゲームスタート">
+                </form>
+            </div>
+        </header>
       </div>
       <?php }else{ ?>
         <header class="header">
@@ -465,7 +474,7 @@ if(!empty($_POST)){
             <div class="infoation__town">
                 <div class="information__town-name">
                     現在地 >> <?php echo $_SESSION['area']->getAreaName(); ?>
-                　　　　本日の売上金：99999円</div>
+                　　　　本日の売上金：<?php echo $_SESSION['yen']?>円</div>
             </div>
             <div class="infomation__wrap">
                 <div class="informaiton__w-driver_picture">
