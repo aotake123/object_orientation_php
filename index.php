@@ -261,14 +261,14 @@ $homes[] = new Home( '鉄骨住宅', 'img/home02.jpg', 1500, HOUSE::RC);
 $homes[] = new Home( '高級住宅', 'img/home03.jpg', 1800, HOUSE::SRC);
 $homes[] = new Home( 'タワーマンション', 'img/home04.jpg', 2500, HOUSE::TOWER);
 //住人一覧
-$customers[] = new Customer( '20代社会人', Sex::MAN, 'img/customer01.jpg');
+$customers[] = new Customer( '20代社会人', Sex::MAN, 'img/customer01.png');
 $customers[] = new Customer( '20代社会人', Sex::WOMAN, 'img/customer02.png');
-$customers[] = new Customer( '大学生', Sex::MAN, 'img/customer03.jpg');
-$customers[] = new Customer( '女子大生', Sex::WOMAN, 'img/customer04.jpg');
-$customers[] = new Customer( '30代社会人', Sex::MAN, 'img/customer05.jpg');
-$customers[] = new Customer( '30代社会人', Sex::WOMAN, 'img/customer06.jpg');
-$customers[] = new Customer( '40代社会人', Sex::MAN, 'img/customer07.jpg');
-$customers[] = new Customer( '40代社会人', Sex::WOMAN, 'img/customer08.jpg');
+$customers[] = new Customer( '大学生', Sex::MAN, 'img/customer03.png');
+$customers[] = new Customer( '女子大生', Sex::WOMAN, 'img/customer04.png');
+$customers[] = new Customer( '30代社会人', Sex::MAN, 'img/customer05.png');
+$customers[] = new Customer( '30代社会人', Sex::WOMAN, 'img/customer06.png');
+$customers[] = new Customer( '40代社会人', Sex::MAN, 'img/customer07.png');
+$customers[] = new Customer( '40代社会人', Sex::WOMAN, 'img/customer08.png');
 //エリア一覧
 $areas[] = new Area( '新宿', 'img/area01.jpg', 15, 10, 15);
 $areas[] = new Area( '表参道', 'img/area02.jpg', 20, 15, 20);
@@ -293,7 +293,7 @@ function moving(){  //店舗係数、建物係数、荷物係数、エリア係�
         createArea();
         //$_SESSION['distance'] = $_SESSION['shop']->getDistance();   //集荷
         $_SESSION['distance'] = 1500;
-    }else{
+    }else if(!empty($transFlg)){
         createArea();
         //$_SESSION['distance'] = $_SESSION['homes']->getDistance();  //配送
         $_SESSION['distance'] = 1500;
@@ -302,7 +302,8 @@ function moving(){  //店舗係数、建物係数、荷物係数、エリア係�
     //体力低下(40配送で死亡、1配送で2.5P、1移動で1.25P減る)
     $_SESSION['driver']->setHp($_SESSION['driver']->getHp() - $_SESSION['distance']/1500 * 1.25); //移動距離*2.5ポイント
     //時間経過（1配送で20分、1移動毎に平均10分経過する）
-        //編集中
+    global $tmp;
+    strtotime('+10minute' , $tmp);
     //やる気DOWN（40配送でやる気ゼロ、1配送毎に2.5%、1移動毎に1.25%低下）
     $_SESSION['driver']->setPassion($_SESSION['driver']->getPassion() - $_SESSION['distance']/1500 * 1.25);
     //満腹度DOWN（20配送で空腹、1配送毎に平均5%、1移動毎に2.5%低下）
@@ -338,8 +339,9 @@ function createHome(){
 
 function createCustomer(){
     global $customers;
-    $customer = $customers[mt_rand(0,1)];
+    $customer = $customers[mt_rand(0,7)];
     $_SESSION['customer'] = $customer;
+    debug('$_SESSIONデータ：'.print_r($_SESSION['customer'],true));
     History::set($_SESSION['customer']->getName().'が玄関口から現れた！！');
 }
 function createArea(){
@@ -452,21 +454,19 @@ if(!empty($_POST)){
   </head>
 
   <body>
-    <div class="main">
+    <div id="l-main">
       <?php if(empty($_SESSION)){ ?>
-      <div class="top__image">
-        <header>
-            <h1 class="subject">配達シュミレータ</h1>
-            <h2>GAME START ?</h2>
-            <div class="top__button">
+        <header id="l-header">
+            <div class="l-header__topImage">
                 <form method="post">
-                <input type="submit" name="start" value="▶ゲームスタート">
+                    <div class="p-header-btn">
+                        <input type="submit" name="start" value="▶ゲームスタート">
+                    </div>
                 </form>
             </div>
         </header>
-      </div>
       <?php }else{ ?>
-        <header class="header">
+        <header id="l-header">
             <div class="subject"><h1>配達シュミレータ</h1></div>
             <div class="header__clock"><?php echo date('H時i分',$tmp); ?></div>
             <div class="header__date">
@@ -500,12 +500,18 @@ if(!empty($_POST)){
             <div class="infomation__wrap">
                 <div class="informaiton__w-driver_picture">
                     <div>
-                        <img class="prof_image" src="<?php echo $_SESSION['driver']->getFaceImg(); ?>">
+                       <img class="prof_image" src="
+                       <?php 
+                       if(!empty($pickFlg)){ echo $_SESSION['driver']->getFaceImg();
+                       }else{ echo 'img/driver02.png'; } ?>">
                     </div>
                 </div>
                 <div class="information__w-change_picture">
                     <div>
-                        <img class="prof_image" src="<?php echo $_SESSION['shop']->getSpotImg(); ?>">
+                        <img class="prof_image" src="
+                        <?php
+                        if(!empty($pickFlg)){ echo $_SESSION['shop']->getSpotImg();
+                        }else{ echo $_SESSION['customer']->getImg(); } ?>">
                     </div>
                 </div>
                 <div class="information__w-status window">
@@ -520,7 +526,7 @@ if(!empty($_POST)){
                 <?php echo (!empty($_SESSION['history'])) ? $_SESSION['history'] : ''; ?>
             </div>
         </div>
-        <footer class="footer">
+        <footer id="l-footer">
             <div class="footer__command">
                 <form method="post" class="footer__command-post">
                     <table class="footer__command-table"><tbody>
