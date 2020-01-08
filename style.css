@@ -28,7 +28,7 @@ body{
 }
 
 /* main */
-.main{
+#l-main{
     border: 2px solid #1e1e1e;
     border-radius: 3px;
     position:relative;
@@ -39,10 +39,24 @@ body{
 }
 
 /* header */
-.header{
+#l-header{
     background-color: #123498;
     position: relative;
     overflow: hidden;
+}
+.l-header__topImage{
+    width: 340px;
+    height: 750px;
+    background-image: url(img/topimage.png);
+    background-size: cover;
+    position: relative;
+}
+.p-header-btn{
+    width: 340px;
+    height: 750px;
+    background-image: url(img/gamestart.png);
+    background-size: cover;
+    position: absolute;
 }
 .subject{
     padding: 5px 15px;
@@ -114,7 +128,7 @@ body{
     height: 65px;
     margin: auto 15px 0 0;
     border: 2px solid #d8d8d8;
-    background-color: rgba(30, 30, 30, 0.3);
+    background-color: rgba(255, 255, 255, 0.3);
     border-radius: 3px;
 }
 .information__w-change_picture{
@@ -122,6 +136,7 @@ body{
     height: 65px;
     margin: auto 15px 0 0;
     border: 2px solid #d8d8d8;
+    background-color: rgba(255, 255, 255, 0.3);
     border-radius: 3px;
 }
 .informaiton__w-status{
@@ -152,7 +167,7 @@ body{
 }
 
 /* footer */
-.footer{
+#l-footer{
     padding: 5 10px;
     background-color: #013791;
 }
