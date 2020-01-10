@@ -6,19 +6,23 @@ session_start();
 
 require('function.php');
 
-//年月日表示用関数
-if(empty($_SESSION) || empty($firstTime)){
+//初期状態の年月日表示用関数
+if((!empty($_SESSION)) && empty($_SESSION['tmp'])){
     $firstTime = '20191201080000';  //初期設定値 文字列型
+    $_SESSION['tmp'] = strtotime($firstTime);
 }
-$tmp = strtotime($firstTime);
 $week = array('日','月','火','水','木','金','土');
-$weekNumber = date('w');
+$weekNumber = date('w', $_SESSION['tmp']);
 
-//インスタンス格納用変数
+//インスタンス格納用配列
     $shops = array();   //店舗一覧
     $homes = array();   //住居一覧
     $customers = array();    //住人一覧
     $areas = array();    //配送地域一覧
+
+//フラグ変数
+    $pickFlg = "";
+    $transFlg = "";
 
 class Sex{
     const MAN = 1;
@@ -37,7 +41,7 @@ class MESSAGE{
     const Positive_shop2 = よろしくお願いします！;
     const Positive_cust1 = ありがとう！;
     const Positive_cust2 = おおきに！;
-    const Positive_cust3 = お疲れ様。配送頑張ってね！;
+    const Positive_cust3 = 配送頑張って！;
 }
 class HOUSE{
     const WOOD = 1;
@@ -94,9 +98,8 @@ Class Driver extends Human{
          return $this->clock;
      }
      public function setHp($num3){
-         if($num3 < 0){
-             $num3 = 0;
-         }
+        if($num3 < 0){ $num3 = 0;}
+        if($num3 > 100){ $num3 = 100; }
          $this->hp = $num3;
      }
      public function getHp(){
@@ -106,9 +109,8 @@ Class Driver extends Human{
          return $this->faceimg;
      }
      public function setHungry($num5){
-        if($num5 < 0){
-            $num5 = 0;
-        }
+        if($num5 < 0){ $num5 = 0;}
+        if($num5 > 100){ $num5 = 100; }
          $this->hungry = $num5;
      }
      public function getHungry(){
@@ -118,6 +120,7 @@ Class Driver extends Human{
         if($num7 < 0){
             $num7 = 0;
         }
+        $this->toilet = $num7;
      }
      public function getToilet(){
          return $this->toilet;
@@ -129,12 +132,17 @@ Class Driver extends Human{
          return $this->money;
      }
      public function setPassion($num9){
+        if($num9 < 0){ $num9 = 0;}
+        if($num9 > 100){ $num9 = 100; }
          $this->passion = $num9;
      }
      public function getPassion(){
          return $this->passion;
      }
      public function setBike($num10){
+         if($num10 <0){
+             $num10 = 0;
+         }
          $this->bike = $num10;
      }
      public function getBike(){
@@ -249,26 +257,26 @@ class History{
 $driver = new Driver('宇羽太郎', Sex::MAN, 30, 100, 'img/driver01.png', 100, 100, 30, 100, 50);
 //ショップ一覧
 $shops[] = new Shop( 'マクドナルド', 'img/shop01.jpeg', 1000, Item::LIGHT, 'ハンバーガー');
-$shops[] = new Shop( 'タピオカ屋', 'img/shop02.jpeg', 1500, Item::LIGHT, 'タピオカミルクティー');
+$shops[] = new Shop( 'タピオカ屋', 'img/shop02.jpeg', 1500, Item::LIGHT, 'タピオカ茶');
 $shops[] = new Shop( '吉野家', 'img/shop03.jpg', 1200, Item::LIGHT, '牛丼');
 $shops[] = new Shop( '筋肉食堂', 'img/shop04.jpg', 1500, Item::MIDDLE, '日替わり弁当');
 $shops[] = new Shop( '松屋', 'img/shop05.jpg', 1200, Item::MIDDLE, '牛めし');
-$shops[] = new Shop( 'オリジン弁当', 'img/shop06.jpg', 1800, Item::MIDDLE, '幕内弁当');
+$shops[] = new Shop( 'オリジン弁当', 'img/shop06.jpg', 1800, Item::MIDDLE, '幕ノ内弁当');
 $shops[] = new Shop( 'ゴーゴーカレー', 'img/shop07.jpg', 1800, Item::MIDDLE, 'メジャーカレー');
 //住宅一覧
-$homes[] = new Home( '木造住宅', 'img/home01.jpg', 1000, HOUSE::WOOD);
-$homes[] = new Home( '鉄骨住宅', 'img/home02.jpg', 1500, HOUSE::RC);
-$homes[] = new Home( '高級住宅', 'img/home03.jpg', 1800, HOUSE::SRC);
-$homes[] = new Home( 'タワーマンション', 'img/home04.jpg', 2500, HOUSE::TOWER);
+$homes[] = new Home( '木造住宅', 'img/home01.jpg', 1050, HOUSE::WOOD);
+$homes[] = new Home( '鉄骨住宅', 'img/home02.jpg', 1550, HOUSE::RC);
+$homes[] = new Home( '高級住宅', 'img/home03.jpg', 1850, HOUSE::SRC);
+$homes[] = new Home( 'タワマン', 'img/home04.jpg', 2550, HOUSE::TOWER);
 //住人一覧
-$customers[] = new Customer( '20代社会人', Sex::MAN, 'img/customer01.png');
-$customers[] = new Customer( '20代社会人', Sex::WOMAN, 'img/customer02.png');
+$customers[] = new Customer( '20代の男性', Sex::MAN, 'img/customer01.png');
+$customers[] = new Customer( '20代の女性', Sex::WOMAN, 'img/customer02.png');
 $customers[] = new Customer( '大学生', Sex::MAN, 'img/customer03.png');
 $customers[] = new Customer( '女子大生', Sex::WOMAN, 'img/customer04.png');
-$customers[] = new Customer( '30代社会人', Sex::MAN, 'img/customer05.png');
-$customers[] = new Customer( '30代社会人', Sex::WOMAN, 'img/customer06.png');
-$customers[] = new Customer( '40代社会人', Sex::MAN, 'img/customer07.png');
-$customers[] = new Customer( '40代社会人', Sex::WOMAN, 'img/customer08.png');
+$customers[] = new Customer( '30代の男性', Sex::MAN, 'img/customer05.png');
+$customers[] = new Customer( '30代の女性', Sex::WOMAN, 'img/customer06.png');
+$customers[] = new Customer( '40代の男性', Sex::MAN, 'img/customer07.png');
+$customers[] = new Customer( '40代の女性', Sex::WOMAN, 'img/customer08.png');
 //エリア一覧
 $areas[] = new Area( '新宿', 'img/area01.jpg', 15, 10, 15);
 $areas[] = new Area( '表参道', 'img/area02.jpg', 20, 15, 20);
@@ -291,19 +299,19 @@ function moving(){  //店舗係数、建物係数、荷物係数、エリア係�
     //移動距離の設計
     if(!empty($pickFlg)){
         createArea();
-        //$_SESSION['distance'] = $_SESSION['shop']->getDistance();   //集荷
-        $_SESSION['distance'] = 1500;
+        $_SESSION['distance'] = $_SESSION['shop']->getDistance();   //集荷
+        debug('現在の距離データ（集荷）：'.print_r($_SESSION['distance'],true));
     }else if(!empty($transFlg)){
         createArea();
-        //$_SESSION['distance'] = $_SESSION['homes']->getDistance();  //配送
-        $_SESSION['distance'] = 1500;
+        $_SESSION['distance'] = $_SESSION['home']->getDistance();  //配送
+        debug('現在の距離データ（配送）：'.print_r($_SESSION['distance'],true));
     }
     //移動距離をランダムに増減させて合計から差し引く
-    //体力低下(40配送で死亡、1配送で2.5P、1移動で1.25P減る)
+        //検討中
+    //体力低下(40配送で死亡、1配送で2.5P、1移動で1.25P減)
     $_SESSION['driver']->setHp($_SESSION['driver']->getHp() - $_SESSION['distance']/1500 * 1.25); //移動距離*2.5ポイント
-    //時間経過（1配送で20分、1移動毎に平均10分経過する）
-    global $tmp;
-    strtotime('+10minute' , $tmp);
+    //時間経過（1配送で20分、1移動毎に平均10分経過）
+    $_SESSION['tmp'] += $_SESSION['distance']/1500 * 10 * 60;
     //やる気DOWN（40配送でやる気ゼロ、1配送毎に2.5%、1移動毎に1.25%低下）
     $_SESSION['driver']->setPassion($_SESSION['driver']->getPassion() - $_SESSION['distance']/1500 * 1.25);
     //満腹度DOWN（20配送で空腹、1配送毎に平均5%、1移動毎に2.5%低下）
@@ -317,19 +325,14 @@ function moving(){  //店舗係数、建物係数、荷物係数、エリア係�
 function createDriver(){
     global $driver;
     $_SESSION['driver'] = $driver;
-    //debug('配達員データ：'.print_r($_SESSION['driver'],true));
-
 }
 function createShop(){
     global $shops;
-    //debug('$shopsデータ：'.print_r($shops,true));
-    $shop = $shops[mt_rand(0,1)];
-    //debug('$shopデータ：'.print_r($shop,true));
+    $shop = $shops[mt_rand(0,6)];
     $transFlg = "";
     History::set('アプリから注文が入りました！');
     $_SESSION['shop'] = $shop;
     $_SESSION['distance'] = $_SESSION['shop']->getDistance();
-
 }
 function createHome(){
     global $homes;
@@ -341,7 +344,6 @@ function createCustomer(){
     global $customers;
     $customer = $customers[mt_rand(0,7)];
     $_SESSION['customer'] = $customer;
-    debug('$_SESSIONデータ：'.print_r($_SESSION['customer'],true));
     History::set($_SESSION['customer']->getName().'が玄関口から現れた！！');
 }
 function createArea(){
@@ -350,7 +352,7 @@ function createArea(){
     $_SESSION['area'] = $area;
 }
 function getMoney(){
-    $_SESSION['yen'] = $_SESSION['yen'] + 500;
+    $_SESSION['yen'] = $_SESSION['yen'] + $_SESSION['distance'] / 1500 * 500;
 }
 
 function init(){
@@ -361,22 +363,20 @@ function init(){
     createArea();
     $_SESSION['DriveryCount'] = 0;  //配達回数
     $_SESSION['yen'] = 0;   //本日の売上
-    $_SESSION['bike'] = 50; //自転車電池残量
-    $_SESSION['manpuku'] = 100;     //満腹度
-    $_SESSION['toilet'] = 100;  //トイレ安全度
     $_SESSION['driver']->setPassion(100);    //やる気初期化
     $_SESSION['driver']->setHp(100);    //HP初期化
     $_SESSION['driver']->setHungry(100);    //満腹度初期化
     $_SESSION['driver']->setToilet(100);    //トイレ危険度初期化
     $_SESSION['driver']->setBike(50);      //バイク残量初期化
+    $firstTime = '20191201080000';  //初期設定値 文字列型
+    $_SESSION['tmp'] = strtotime($firstTime);
 }
 function gameOver(){
     $_SESSION = array();
 }
-  
 
-//1.post送信されていた場合
 History::clear();
+//post送信されていた場合
 if(!empty($_POST)){
     $startFlg = (!empty($_POST['start'])) ? true : false;   //初回スタート
     $pickFlg = (!empty($_POST['pick'])) ? true : false;   //集荷
@@ -386,7 +386,12 @@ if(!empty($_POST)){
     $parkFlg = (!empty($_POST['park'])) ? true : false; //公園
     $eatFlg = (!empty($_POST['eat'])) ? true : false;   //飲食店
     $homeFlg = (!empty($_POST['home'])) ? true :false;  //帰宅
+    $moveFlg = (!empty($_POST['move'])) ? true :false;  //エリアの移動
+    $resetFlg = (!empty($_POST['reset'])) ? true :false;  //リセットボタン
     error_log('POSTされた！');
+    debug('$startFlg情報：'.print_r($startFlg,true));
+    debug('$pickFlg情報：'.print_r($pickFlg,true));
+    debug('$transFlg情報：'.print_r($transFlg,true));
 
     if($startFlg){
         History::set('配達をスタートします！');
@@ -395,46 +400,71 @@ if(!empty($_POST)){
         //集荷を押した場合
         if($pickFlg){
             History::set($_SESSION['shop']->getSpotName().'の集荷に訪れた！');
-            moving();   //移動
-        }else if($transFlg){
+            moving();
         //配達を押した場合
-            createHome();   //建物決定
-            createCustomer();   //お客さん属性決定
-            moving();    //移動
-            getMoney(); //売上金額加算
+        }else if($transFlg){
+            createHome();
+            createCustomer();
+            moving();
+            getMoney();
             History::set($_SESSION['shop']->getItemName().'の配送を完了した！');
             createShop();
             $_SESSION['DriveryCount'] = $_SESSION['DriveryCount']+1;
 
-         //条件を満たした場合（体力ゼロ）はゲームオーバーとする
-         //24時を回った場合は日付を翌日の朝8時まで進める
+            //条件を満たした場合（体力ゼロ）はゲームオーバーとする
+            if($_SESSION['driver']->getHp() <= 0){
+                gameOver();
+            }
+            //24時を回った場合は日付を翌日の朝8時まで進める
 
         }else if($cycleFlg){
             History::set('駐輪所に到着した！');
-            //配達員が消耗をする（体力、やる気、空腹、トイレ、電池残量悪化）
-            //一定確率で自転車の電池残量を回復し、一定確率で分岐させる
+            moving();
+            $_SESSION['driver']->setBike(50);
+            History::set('自転車を交換し、電池の残量が満タンになった！');
+
         }else if($combiFlg){
             History::set('コンビニに寄った！');
-            //配達員が消耗をする（体力、やる気、空腹、トイレ、電池残量悪化）
-            //トイレを借りて、トイレとやる気を回復させる
+            moving();
+            History::set('トイレを借りて用を足した！');
+            $_SESSION['driver']->setToilet(100);
             //買うものをランダムに選択して、お金を失わせ、空腹を回復させる
         }else if($parkFlg){
             History::set('公園に到着した！');
-            //配達員が消耗をする（体力、やる気、空腹、トイレ、電池残量悪化）
-            //一定確率で自転車の電池残量を回復し、一定確率で分岐させる
+            moving(); 
+            History::set('休憩して体力とやる気が回復した！');
+            History::set('トイレも借りて用を足した！');
+            $_SESSION['driver']->setToilet(100);
+            $_SESSION['driver']->setHp($_SESSION['driver']->getHp() + 25);
+            $_SESSION['driver']->setPassion($_SESSION['driver']->getPassion() + 25);
         }else if($eatFlg){
+            moving();
             History::set($shops[mt_rand(0,6)]->getSpotName().'に到着し、ご飯を食べた！');
             History::set('宇羽太郎の体力とやる気が回復した！');
             History::set('トイレも借りて用を足した！');
-            $_SESSION['toilet'] = 100;
-            //配達員が消耗をする（体力、やる気、空腹、トイレ、電池残量悪化）
-            //水分と空腹を回復させる、やる気も急増する
+            $_SESSION['driver']->setToilet(100);
+            $_SESSION['driver']->setHungry($_SESSION['driver']->getHungry() + 50);
+            $_SESSION['driver']->setPassion($_SESSION['driver']->getPassion() + 50);
         }else if($homeFlg){
-            History::set('今日は早めに帰って寝よう');
-            //体力を大幅に回復し、やる気、空腹、トイレ、自転車も全回復
+            History::set('「今日は早めに帰って寝よう!」');
+            History::set('宇羽太郎の体力とやる気が回復した！');
+            History::set('夜が明け、新しい朝がやってきた！');
+            $_SESSION['driver']->setHp($_SESSION['driver']->getHp() + 50);
+            $_SESSION['driver']->setToilet(100);
+            $_SESSION['driver']->setBike(50);
+            $_SESSION['driver']->setHungry(100);
+            $_SESSION['driver']->setPassion(100);
+            $_SESSION['driver']->setHp(50);
             //日付を進め、時間も開始時間に変更する
             //新たな集荷を発生させる init関数に引数を入れて条件分岐させる
-        }else{
+
+        }else if($moveFlg){
+            History::set('エリアを移動した！');
+            moving();
+            createArea();
+            History::set($_SESSION['area']->getAreaName().'に到着した！');
+
+        }else if($resetFlg){
             //リセットを押してゲーム初期化
             init();
         }
@@ -468,9 +498,9 @@ if(!empty($_POST)){
       <?php }else{ ?>
         <header id="l-header">
             <div class="subject"><h1>配達シュミレータ</h1></div>
-            <div class="header__clock"><?php echo date('H時i分',$tmp); ?></div>
+            <div class="header__clock"><?php echo date('H時i分',$_SESSION['tmp']); ?></div>
             <div class="header__date">
-                <?php echo date('Y年m月d日',$tmp); ?>(<?php echo $week[$weekNumber]; ?>)
+                <?php echo date('Y年m月d日',$_SESSION['tmp']); ?>(<?php echo $week[$weekNumber]; ?>)
             </div>
             <div class="header__physical"><span class="header__physical--name">やる気 </span>
                 <?php
@@ -495,7 +525,7 @@ if(!empty($_POST)){
             <div class="infoation__town">
                 <div class="information__town-name">
                     現在地 >> <?php echo $_SESSION['area']->getAreaName(); ?>
-                　　　　本日の売上金：<?php echo $_SESSION['yen']?>円</div>
+                　　　　本日の売上金：<?php echo ceil($_SESSION['yen']); ?>円</div>
             </div>
             <div class="infomation__wrap">
                 <div class="informaiton__w-driver_picture">
@@ -511,7 +541,10 @@ if(!empty($_POST)){
                         <img class="prof_image" src="
                         <?php
                         if(!empty($pickFlg)){ echo $_SESSION['shop']->getSpotImg();
-                        }else{ echo $_SESSION['customer']->getImg(); } ?>">
+                        }else if(!empty($startFlg)){echo $_SESSION['shop']->getSpotImg(); 
+                        }else{ echo $_SESSION['customer']->getImg(); } 
+                        ?>
+                        ">
                     </div>
                 </div>
                 <div class="information__w-status window">
