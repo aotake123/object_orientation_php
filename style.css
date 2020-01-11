@@ -52,9 +52,14 @@ body{
     position: relative;
 }
 .p-header-btn{
-    width: 340px;
-    height: 750px;
-    background-image: url(img/gamestart.png);
+    width: 259px;
+    height: 43px;
+    top: 570px;
+    left: 43px;
+    border: none;
+    color: transparent;
+    font-size: 0;
+    background-image: url(img/gamestart.jpg);
     background-size: cover;
     position: absolute;
 }
@@ -181,6 +186,7 @@ body{
     display: none;
 }
 .footer__command-table{
+    padding-top: 7px;
     margin: 0 auto;
 }
 
@@ -188,8 +194,10 @@ body{
 form{
     overflow: hidden;
 }
-
 input[type="submit"]{
+    cursor: pointer;
+}
+.cell{
     width: 77px;
     border: none;
     font-size: 14px;
@@ -200,7 +208,7 @@ input[type="submit"]{
     border-radius: 3px;
     color: white;
 }
-input[type="submit"]:hover{
+.cell:hover{
     background: #4D68B7;
     cursor: pointer;
 }
