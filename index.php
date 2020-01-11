@@ -182,7 +182,6 @@ abstract class Building{
     }
 }
 
-
 Class Shop extends Building{
     protected $itemWeight;
     protected $itemName; //渡す商品の名前
@@ -278,21 +277,21 @@ $customers[] = new Customer( '30代の女性', Sex::WOMAN, 'img/customer06.png')
 $customers[] = new Customer( '40代の男性', Sex::MAN, 'img/customer07.png');
 $customers[] = new Customer( '40代の女性', Sex::WOMAN, 'img/customer08.png');
 //エリア一覧
-$areas[] = new Area( '新宿', 'img/area01.jpg', 15, 10, 15);
-$areas[] = new Area( '表参道', 'img/area02.jpg', 20, 15, 20);
-$areas[] = new Area( '渋谷', 'img/area03.jpg', 15, 10, 15);
-$areas[] = new Area( '恵比寿', 'img/area04.jpg', 15, 10, 15);
-$areas[] = new Area( '中目黒', 'img/area05.jpg', 20, 10, 20);
-$areas[] = new Area( '五反田', 'img/area06.jpg', 20, 10, 15);
-$areas[] = new Area( '品川', 'img/area07.jpg', 25, 10, 20);
-$areas[] = new Area( '田町', 'img/area08.jpg', 25, 10, 20);
-$areas[] = new Area( '新橋', 'img/area09.jpg', 20, 15, 20);
-$areas[] = new Area( '赤坂', 'img/area10.jpg', 10, 15, 15);
-$areas[] = new Area( '六本木', 'img/area11.jpg', 15, 10, 15);
-$areas[] = new Area( '麻布十番', 'img/area12.jpg', 15, 10, 15);
-$areas[] = new Area( '青山一丁目', 'img/area13.jpg', 20, 15, 25);
-$areas[] = new Area( '神宮前', 'img/area14.jpg', 20, 20, 20);
-$areas[] = new Area( '代々木', 'img/area15.jpg', 15, 10, 15);
+$areas[] = new Area( '新宿', 'img/area01.jpg', 1, 0.9, 1);
+$areas[] = new Area( '表参道', 'img/area02.jpg', 1.1, 1, 1.1);
+$areas[] = new Area( '渋谷', 'img/area03.jpg', 1, 0.9, 1);
+$areas[] = new Area( '恵比寿', 'img/area04.jpg', 1, 0.9, 1);
+$areas[] = new Area( '中目黒', 'img/area05.jpg', 1.1, 0.9, 1.1);
+$areas[] = new Area( '五反田', 'img/area06.jpg', 1.1, 0.9, 1);
+$areas[] = new Area( '品川', 'img/area07.jpg', 1.2, 0.9, 1.1);
+$areas[] = new Area( '田町', 'img/area08.jpg', 1.2, 0.9, 1.1);
+$areas[] = new Area( '新橋', 'img/area09.jpg', 1.1, 1, 1.1);
+$areas[] = new Area( '赤坂', 'img/area10.jpg', 0.85, 1, 1);
+$areas[] = new Area( '六本木', 'img/area11.jpg', 1, 0.9, 1);
+$areas[] = new Area( '麻布十番', 'img/area12.jpg', 1, 0.9, 1);
+$areas[] = new Area( '青山一丁目', 'img/area13.jpg', 1.1, 1, 1.2);
+$areas[] = new Area( '神宮前', 'img/area14.jpg', 1.1, 1.1, 1.1);
+$areas[] = new Area( '代々木', 'img/area15.jpg', 1, 0.9, 1);
 
 
 function moving(){  //店舗係数、建物係数、荷物係数、エリア係数
@@ -306,12 +305,34 @@ function moving(){  //店舗係数、建物係数、荷物係数、エリア係�
         $_SESSION['distance'] = $_SESSION['home']->getDistance();  //配送
         debug('現在の距離データ（配送）：'.print_r($_SESSION['distance'],true));
     }
-    //移動距離をランダムに増減させて合計から差し引く
-        //検討中
+    //やる気の値によって計算距離を上下させる
+    if($_SESSION['driver']->getPassion() >= 80){
+        $_SESSION['distance'] = $_SESSION['distance'] * 0.9;
+    }else if($_SESSION['driver']->getPassion() < 80 && $_SESSION['driver']->getPassion() >= 60){
+        $_SESSION['distance'] = $_SESSION['distance'] * 0.95;
+    }else if($_SESSION['driver']->getPassion() < 60 && $_SESSION['driver']->getPassion() >= 40){
+        $_SESSION['distance'] = $_SESSION['distance'] * 1;
+    }else if($_SESSION['driver']->getPassion() < 40 && $_SESSION['driver']->getPassion() >= 20){
+        $_SESSION['distance'] = $_SESSION['distance'] * 1.05;
+    }else{
+        $_SESSION['distance'] = $_SESSION['distance'] * 1.1;
+    }
     //体力低下(40配送で死亡、1配送で2.5P、1移動で1.25P減)
     $_SESSION['driver']->setHp($_SESSION['driver']->getHp() - $_SESSION['distance']/1500 * 1.25); //移動距離*2.5ポイント
+        //満腹度がゼロの場合、追加で15Pの体力を消費
+        if($_SESSION['driver']->getHungry() === 0){ 
+            $_SESSION['driver']->setHp($_SESSION['driver']->getHp() - 15);
+        }
     //時間経過（1配送で20分、1移動毎に平均10分経過）
     $_SESSION['tmp'] += $_SESSION['distance']/1500 * 10 * 60;
+        //満腹度がゼロの場合、所用時間を1.5倍に増加させる
+        if($_SESSION['driver']->getHungry() === 0){ 
+            $_SESSION['tmp'] += $_SESSION['distance']/1500 * 10 * 60 * 0.5;
+        }
+        //トイレ係数がゼロの場合、所用時間を2倍に増加させる
+        if($_SESSION['driver']->getToilet() === 0){ 
+            $_SESSION['tmp'] += $_SESSION['distance']/1500 * 10 * 60;
+        }
     //やる気DOWN（40配送でやる気ゼロ、1配送毎に2.5%、1移動毎に1.25%低下）
     $_SESSION['driver']->setPassion($_SESSION['driver']->getPassion() - $_SESSION['distance']/1500 * 1.25);
     //満腹度DOWN（20配送で空腹、1配送毎に平均5%、1移動毎に2.5%低下）
@@ -353,6 +374,22 @@ function createArea(){
 }
 function getMoney(){
     $_SESSION['yen'] = $_SESSION['yen'] + $_SESSION['distance'] / 1500 * 500;
+}
+function SosComment(){
+    if($_SESSION['driver']->getHungry() === 0){
+        History::set('空腹で倒れそうだ！何か食べないと死んでしまう！');
+    }else if($_SESSION['driver']->getHungry() < 10){
+        History::set('すごくお腹が空いてきた・・・。');
+    }else if($_SESSION['driver']->getHungry() < 50){
+        History::set('お腹が空いてきた・・・。');
+    }else if($_SESSION['driver']->getToilet() === 0){
+        History::set('まずい、もう漏れてしまいそうだ！');
+        History::set('配送に大幅な遅れが発生する状態です！');
+    }else if($_SESSION['driver']->getToilet() < 10){
+        History::set('すごくトイレに行きたくなってきた・・・。');
+    }else if($_SESSION['driver']->getToilet() < 50){
+        History::set('トイレに行きたくなってきた・・・。');
+    }
 }
 
 function init(){
@@ -401,13 +438,14 @@ if(!empty($_POST)){
         if($pickFlg){
             History::set($_SESSION['shop']->getSpotName().'の集荷に訪れた！');
             moving();
+            SosComment();
         //配達を押した場合
         }else if($transFlg){
             createHome();
             createCustomer();
             moving();
             getMoney();
-            History::set($_SESSION['shop']->getItemName().'の配送を完了した！');
+            History::set($_SESSION['shop']->getItemName().'の配送を完了した！(報酬'.ceil($_SESSION['distance'] / 1500 * 500).'円)');
             createShop();
             $_SESSION['DriveryCount'] = $_SESSION['DriveryCount']+1;
 
@@ -415,7 +453,7 @@ if(!empty($_POST)){
             if($_SESSION['driver']->getHp() <= 0){
                 gameOver();
             }
-            //24時を回った場合は日付を翌日の朝8時まで進める
+            //12時間経過した場合は日付を翌日の朝8時まで進める
 
         }else if($cycleFlg){
             History::set('駐輪所に到着した！');
@@ -428,7 +466,6 @@ if(!empty($_POST)){
             moving();
             History::set('トイレを借りて用を足した！');
             $_SESSION['driver']->setToilet(100);
-            //買うものをランダムに選択して、お金を失わせ、空腹を回復させる
         }else if($parkFlg){
             History::set('公園に到着した！');
             moving(); 
@@ -489,9 +526,7 @@ if(!empty($_POST)){
         <header id="l-header">
             <div class="l-header__topImage">
                 <form method="post">
-                    <div class="p-header-btn">
-                        <input type="submit" name="start" value="▶ゲームスタート">
-                    </div>
+                    <input type="submit" name="start" class="p-header-btn">
                 </form>
             </div>
         </header>
@@ -567,23 +602,23 @@ if(!empty($_POST)){
                             <?php
                             if(empty($pickFlg)){
                             ?>
-                                <td class="cell"><input type="submit" name="pick" value="集荷" class="cell"></td>
+                            <td><input type="submit" name="pick" value="集荷" class="cell"></td>
                             <?php
                             }else{
                             ?>
-                                <td class="cell"><input type="submit" name="transport" value="配達" class="cell"></td>
+                            <td><input type="submit" name="transport" value="配達" class="cell"></td>
                             <?php
                             } 
                             ?>
-                            <td class="cell"><input type="submit" name="cycle" value="駐輪所"></td>
-                            <td class="cell"><input type="submit" name="combi" value="コンビニ"></td>
-                            <td class="cell"><input type="submit" name="park" value="公園"></td>
+                            <td><input type="submit" name="cycle" value="駐輪所" class="cell"></td>
+                            <td><input type="submit" name="combi" value="コンビニ" class="cell"></td>
+                            <td><input type="submit" name="park" value="公園" class="cell"></td>
                         </tr>
                         <tr>
-                            <td class="cell"><input type="submit" name="eat" value="飲食店"></td>
-                            <td class="cell"><input type="submit" name="home" value="帰宅"></td>
-                            <td class="cell"><input type="submit" name="move" value="移動"></td>
-                            <td class="cell"><input type="submit" name="reset" value="リセット"></td>
+                            <td><input type="submit" name="eat" value="飲食店" class="cell"></td>
+                            <td><input type="submit" name="home" value="帰宅" class="cell"></td>
+                            <td><input type="submit" name="move" value="移動" class="cell"></td>
+                            <td><input type="submit" name="reset" value="リセット" class="cell"></td>
                         </tr>
                     </tbody></table>
                 </form>
