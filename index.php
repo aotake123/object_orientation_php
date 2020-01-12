@@ -408,6 +408,14 @@ function init(){
     $firstTime = '20191201080000';  //初期設定値 文字列型
     $_SESSION['tmp'] = strtotime($firstTime);
 }
+
+function preGameOver(){
+    $_SESSION['gameover'] = "";
+    History::clear();
+    History::set('体力が尽き、宇羽太郎は救急車で搬送された！');
+    History::set('その後、彼の行方を知る者は、誰もいなかった…。');
+}
+
 function gameOver(){
     $_SESSION = array();
 }
@@ -451,7 +459,7 @@ if(!empty($_POST)){
 
             //条件を満たした場合（体力ゼロ）はゲームオーバーとする
             if($_SESSION['driver']->getHp() <= 0){
-                gameOver();
+                preGameOver();
             }
             //12時間経過した場合は日付を翌日の朝8時まで進める
 
@@ -494,17 +502,20 @@ if(!empty($_POST)){
             $_SESSION['driver']->setHp(50);
             //日付を進め、時間も開始時間に変更する
             //新たな集荷を発生させる init関数に引数を入れて条件分岐させる
-
         }else if($moveFlg){
             History::set('エリアを移動した！');
             moving();
             createArea();
             History::set($_SESSION['area']->getAreaName().'に到着した！');
-
         }else if($resetFlg){
             //リセットを押してゲーム初期化
             init();
         }
+
+        if($_SESSION['driver']->getHp() <= 0){
+            preGameOver();
+        }
+
     } 
     //トップ画面に戻す
     $_POST = array();
@@ -598,6 +609,9 @@ if(!empty($_POST)){
             <div class="footer__command">
                 <form method="post" class="footer__command-post">
                     <table class="footer__command-table"><tbody>
+                        <?php
+                        if($_SESSION['driver']->getHp() > 0){
+                        ?>
                         <tr>
                             <?php
                             if(empty($pickFlg)){
@@ -620,6 +634,24 @@ if(!empty($_POST)){
                             <td><input type="submit" name="move" value="移動" class="cell"></td>
                             <td><input type="submit" name="reset" value="リセット" class="cell"></td>
                         </tr>
+                        <?php
+                        }else{
+                        ?>
+                        <tr>
+                            <td><input type="submit" name="reset" value="BadEnd" class="cell"></td>
+                            <td><input type="submit" name="reset" value="BadEnd" class="cell"></td>
+                            <td><input type="submit" name="reset" value="BadEnd" class="cell"></td>
+                            <td><input type="submit" name="reset" value="BadEnd" class="cell"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="submit" name="reset" value="BadEnd" class="cell"></td>
+                            <td><input type="submit" name="reset" value="BadEnd" class="cell"></td>
+                            <td><input type="submit" name="reset" value="BadEnd" class="cell"></td>
+                            <td><input type="submit" name="reset" value="BadEnd" class="cell"></td>
+                        </tr>
+                        <?php
+                        }
+                        ?>
                     </tbody></table>
                 </form>
             </div>
