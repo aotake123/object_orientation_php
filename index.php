@@ -392,6 +392,12 @@ function SosComment(){
     }
 }
 
+function nextDay(){
+    $_SESSION['tmp'] = strtotime('+1 day', $_SESSION['tmp']);
+    $time_target = '08:00:00';
+    $_SESSION['tmp'] = strtotime($time_target);
+}
+
 function init(){
     History::clear();
     History::set('配達の仕事を開始します！');
@@ -421,6 +427,8 @@ function gameOver(){
 }
 
 History::clear();
+
+
 //post送信されていた場合
 if(!empty($_POST)){
     $startFlg = (!empty($_POST['start'])) ? true : false;   //初回スタート
@@ -578,17 +586,28 @@ if(!empty($_POST)){
                     <div>
                        <img class="prof_image" src="
                        <?php 
-                       if(!empty($pickFlg)){ echo $_SESSION['driver']->getFaceImg();
-                       }else{ echo 'img/driver02.png'; } ?>">
+                       if ($_SESSION['driver']->getHp() === 0){ echo 'img/hansou.jpg';
+                       }else if($_SESSION['driver']->getHungry() === 0){ echo 'img/driver03.png';
+                        }else if(!empty($pickFlg)){ echo $_SESSION['driver']->getFaceImg();
+                       }else if(!empty($transFlg)){ echo 'img/driver02.png'; 
+                       }else if(!empty($homeFlg)){ echo 'img/home.jpg';
+                       }else{ echo $_SESSION['driver']->getFaceImg(); } ?>">
                     </div>
                 </div>
                 <div class="information__w-change_picture">
                     <div>
                         <img class="prof_image" src="
                         <?php
-                        if(!empty($pickFlg)){ echo $_SESSION['shop']->getSpotImg();
+                        if($_SESSION['driver']->getHp() === 0){ echo 'img/lost.jpg';
+                        }else if(!empty($pickFlg)){ echo $_SESSION['shop']->getSpotImg();
                         }else if(!empty($startFlg)){echo $_SESSION['shop']->getSpotImg(); 
-                        }else{ echo $_SESSION['customer']->getImg(); } 
+                        }else if(!empty($transFlg)){ echo $_SESSION['customer']->getImg();
+                        }else if(!empty($parkFlg)){ echo 'img/park.jpg';
+                        }else if(!empty($eatFlg)){ echo 'img/eat.jpg';
+                        }else if(!empty($cycleFlg)){ echo 'img/bike.jpg';
+                        }else if(!empty($combiFlg)){ echo 'img/combi.jpg';
+                        }else if(!empty($homeFlg)){ echo 'img/sun.jpg';
+                        } 
                         ?>
                         ">
                     </div>
