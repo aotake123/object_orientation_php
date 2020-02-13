@@ -40,7 +40,7 @@ class MESSAGE{
     const Positive_shop1 = 配達お願いします！;
     const Positive_shop2 = よろしくお願いします！;
     const Positive_cust1 = ありがとう！;
-    const Positive_cust2 = おおきに！;
+    const Positive_cust2 = おおきにっ！;
     const Positive_cust3 = 配送頑張って！;
 }
 class HOUSE{
